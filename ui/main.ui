@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>680</width>
-    <height>480</height>
+    <height>460</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -338,7 +338,7 @@
      <string>Start!</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>480</x>
@@ -404,7 +404,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>
