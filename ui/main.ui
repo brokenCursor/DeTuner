@@ -37,7 +37,7 @@
      <string>Add backup</string>
     </property>
    </widget>
-   <widget class="QTableView" name="backup_table">
+   <widget class="QListWidget" name="backup_table">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -55,12 +55,6 @@
     <property name="dragDropOverwriteMode">
      <bool>false</bool>
     </property>
-    <attribute name="horizontalHeaderVisible">
-     <bool>false</bool>
-    </attribute>
-    <attribute name="verticalHeaderVisible">
-     <bool>false</bool>
-    </attribute>
    </widget>
    <widget class="QLabel" name="device_image">
     <property name="geometry">
@@ -165,7 +159,7 @@
       <x>460</x>
       <y>170</y>
       <width>20</width>
-      <height>141</height>
+      <height>131</height>
      </rect>
     </property>
     <property name="orientation">
@@ -315,9 +309,9 @@
    <widget class="Line" name="line_4">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>480</x>
       <y>300</y>
-      <width>201</width>
+      <width>191</width>
       <height>20</height>
      </rect>
     </property>
@@ -395,6 +389,9 @@
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>0</x>
