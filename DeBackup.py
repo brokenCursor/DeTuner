@@ -2,9 +2,6 @@ import os
 import plistlib
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-# for debug only
-from pprint import pprint
-
 
 class DeBackup:
 

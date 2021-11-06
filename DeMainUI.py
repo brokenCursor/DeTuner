@@ -45,8 +45,10 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.device_image.setPixmap(pixmap)
 
         # Fill in backup info
-        self.backup_date_label.setText("Date: " + backup.get_last_backup_date())
-        self.backup_itunes_ver_label.setText("iTunes version: " + backup.get_itunes_version())
+        self.backup_date_label.setText(
+            "Date: " + backup.get_last_backup_date())
+        self.backup_itunes_ver_label.setText(
+            "iTunes version: " + backup.get_itunes_version())
         self.backup_is_encrypted_label.setText("Encrypted: " +
                                                str(backup.get_is_encrypted()))
         self.backup_passcode_set_label.setText("Passcode set: " +
@@ -84,15 +86,15 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
     def add_external_backup(self):
         path = self.get_dir_path()
-        if not path:
-            print(self.show_warning("No backup selected!"))
-            return
-        try:
-            self.import_backup(path)
-        except:
-            self.show_error("Unable to import external backup")
+        if path:
+            try:
+                self.import_backup(path)
+            except:
+                self.show_error("Unable to import external backup")
+            else:
+                self.update_table()
         else:
-            self.update_table()
+            self.show_warning("No backup selected!")
 
     def get_dir_path(self) -> str | None:
         ''' Return path to a directory '''
@@ -144,14 +146,17 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
     def show_warning(self, message, **kwargs) -> None | str:
         ''' A wrapper for show_message function'''
-        return self.show_message(message, QMessageBox.Warning, 'Warning', **kwargs)
+        return self.show_message(message, QMessageBox.Warning,
+                                 'Warning', **kwargs)
 
     def show_error(self, message, **kwargs) -> None | str:
         ''' A wrapper for show_message function'''
-        return self.show_message(message, QMessageBox.Critical, 'Error!', **kwargs)
+        return self.show_message(message, QMessageBox.Critical,
+                                 'Error!', **kwargs)
 
     def show_info(self, message, **kwargs) -> None | str:
-        return self.show_message(message, QMessageBox.Information, 'Info', **kwargs)
+        return self.show_message(message, QMessageBox.Information,
+                                 'Info', **kwargs)
 
 
 if __name__ == '__main__':

@@ -35,6 +35,7 @@ class DeMainUILayout(object):
         self.backup_table.setProperty("showDropIndicator", False)
         self.backup_table.setDragDropOverwriteMode(False)
         self.backup_table.setDefaultDropAction(QtCore.Qt.IgnoreAction)
+        self.backup_table.setIconSize(QtCore.QSize(56, 56))
         self.backup_table.setObjectName("backup_table")
         self.device_image = QtWidgets.QLabel(self.centralwidget)
         self.device_image.setGeometry(QtCore.QRect(290, 10, 80, 130))
