@@ -3,7 +3,7 @@ import os
 from ui.DeMainUILayout import DeMainUILayout
 from DeBackup import DeBackup, InvalidBackupException
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPixmap
 
 
 class DeMainUI(QMainWindow, DeMainUILayout):
@@ -13,11 +13,44 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        backup_paths = self.get_backup_list()
-        for p in backup_paths:
-            self.import_backup(p)
-        self.update_table()
+        self.bind_buttons()
+        self.import_default_backups()
+
+    def bind_buttons(self):
         self.add_backup_button.clicked.connect(self.add_external_backup)
+        self.backup_table.itemSelectionChanged.connect(
+            self.update_selected_backup_info)
+
+    def import_default_backups(self):
+        backup_paths = self.get_backup_list()
+        for path in backup_paths:
+            self.import_backup(path)
+        self.update_table()
+
+    def update_selected_backup_info(self):
+        # Get backup from list by index
+        index = self.backup_table.currentRow()
+        backup = self.__backups[index]
+
+        # Fill in device info
+        self.device_name_label.setText('**' + backup.get_device_name() + '**')
+        self.model_label.setText("Model: " + backup.get_product_name())
+        self.ios_version_label.setText(
+            "iOS Version: " + backup.get_ios_version())
+        self.serial_number_label.setText("S/N: " + backup.get_serial_number())
+        self.imei_label.setText("IMEI: " + backup.get_imei())
+        icon_filename = backup.get_product_type().replace(',', '')
+        pixmap = QPixmap(f"./assets/device_icons/{icon_filename}", ).scaled(
+            80, 130, aspectRatioMode=1)
+        self.device_image.setPixmap(pixmap)
+
+        # Fill in backup info
+        self.backup_date_label.setText("Date: " + backup.get_last_backup_date())
+        self.backup_itunes_ver_label.setText("iTunes version: " + backup.get_itunes_version())
+        self.backup_is_encrypted_label.setText("Encrypted: " +
+                                               str(backup.get_is_encrypted()))
+        self.backup_passcode_set_label.setText("Passcode set: " +
+                                               str(backup.get_is_passcode_set()))
 
     def get_backup_list(self) -> list:
         path = os.path.expanduser(
@@ -28,8 +61,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def import_backup(self, path):
         try:
             backup = DeBackup(path)
-            if backup in self.__backups:
-                print('hit')
+            if backup.get_backup_id() in [b.get_backup_id() for b in self.__backups]:
                 self.show_info("This backup has already been added")
             else:
                 self.__backups.append(backup)
@@ -44,8 +76,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def update_table(self):
         self.backup_table.clear()
         for b in self.__backups:
-            item_text = b.get_display_name() + '\n' + \
-                b.get_last_backup_date()
+            item_text = b.get_display_name() + '\n' + b.get_last_backup_date()
             icon_filename = b.get_product_type().replace(',', '')
             item_icon = QIcon(f"./assets/device_icons/{icon_filename}")
             self.backup_table.addItem(
@@ -71,20 +102,19 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
     def show_message(self, message: str = "An unknown error ocurred!",
                      icon: QMessageBox.Icon = QMessageBox.Critical,
-                     title: str = 'Unknown Error',
-                     buttons: QMessageBox.StandardButtons = QMessageBox.Ok,
-                     details=None) -> str | None:
-        ''' Show a QMessageBox with provided parameters 
-        Parameters:
-            message (str): A string to show as message body. 
-            Default: \'An An unknown error ocurred!\' 
+                     title: str = 'Unknown Error', **kwargs) -> str | None:
+        ''' Show a QMessageBox with provided parameters
 
-            icon (QMessageBox.Icon): An icon to display in message box. 
+        Parameters:
+            message (str): A string to show as message body.
+            Default: \'An An unknown error ocurred!\'
+
+            icon (QMessageBox.Icon): An icon to display in message box.
             Default: \'Critical\'
 
             title (str): Window title. Deafult: \'Unknown Error\'
 
-            buttons (QMessageBox.StandartButtons): a list of buttons to be shown in a message.
+            buttons (QMessageBox.StandartButtons): an object with buttons to be shown
             Default: QMessageBox.Ok
 
             details (str): a detailed description for message
@@ -98,26 +128,30 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         msg = QMessageBox()
         msg.setIcon(icon)
+        # msg.setWindowIcon()
         msg.setText(message)
-        if details:
-            msg.setDetailedText(details)
+        if 'details' in kwargs:
+            msg.setDetailedText(kwargs['details'])
         msg.setWindowTitle(title)
-        msg.setStandardButtons(buttons)
+        if 'button' in kwargs:
+            msg.setStandardButtons(kwargs['buttons'])
+        else:
+            msg.setStandardButtons(QMessageBox.Ok)
         msg.buttonClicked.connect(result_hook)
         _ = msg.exec_()  # idk why, but that's how it works
 
         return func_result  # TODO: fix returning of clicked button
 
-    def show_warning(self, message, details=None):
+    def show_warning(self, message, **kwargs) -> None | str:
         ''' A wrapper for show_message function'''
-        return self.show_message(message, QMessageBox.Warning, 'Warning', details=details)
+        return self.show_message(message, QMessageBox.Warning, 'Warning', **kwargs)
 
-    def show_error(self, message, details=None):
+    def show_error(self, message, **kwargs) -> None | str:
         ''' A wrapper for show_message function'''
-        return self.show_message(message, QMessageBox.Critical, 'Error!', details=details)
+        return self.show_message(message, QMessageBox.Critical, 'Error!', **kwargs)
 
-    def show_info(self, message, details) -> None:
-        return self.show_message(message, QMessageBox.Information, 'Info', details=details)
+    def show_info(self, message, **kwargs) -> None | str:
+        return self.show_message(message, QMessageBox.Information, 'Info', **kwargs)
 
 
 if __name__ == '__main__':

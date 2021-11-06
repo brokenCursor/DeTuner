@@ -52,8 +52,14 @@
     <property name="editTriggers">
      <set>QAbstractItemView::NoEditTriggers</set>
     </property>
+    <property name="showDropIndicator" stdset="0">
+     <bool>false</bool>
+    </property>
     <property name="dragDropOverwriteMode">
      <bool>false</bool>
+    </property>
+    <property name="defaultDropAction">
+     <enum>Qt::IgnoreAction</enum>
     </property>
    </widget>
    <widget class="QLabel" name="device_image">
@@ -70,6 +76,9 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+    <property name="textInteractionFlags">
+     <set>Qt::NoTextInteraction</set>
     </property>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
@@ -95,6 +104,9 @@
        <property name="textFormat">
         <enum>Qt::MarkdownText</enum>
        </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
+       </property>
       </widget>
      </item>
      <item>
@@ -102,12 +114,18 @@
        <property name="text">
         <string>Model:</string>
        </property>
+       <property name="textInteractionFlags">
+        <set>Qt::TextSelectableByMouse</set>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="ios_version_label">
        <property name="text">
-        <string>iOS version:</string>
+        <string>iOS Version:</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::TextSelectableByMouse</set>
        </property>
       </widget>
      </item>
@@ -116,12 +134,18 @@
        <property name="text">
         <string>Serial Number:</string>
        </property>
+       <property name="textInteractionFlags">
+        <set>Qt::TextSelectableByMouse</set>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="imei_label">
        <property name="text">
         <string>IMEI:</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::TextSelectableByMouse</set>
        </property>
       </widget>
      </item>
@@ -305,6 +329,9 @@
     <property name="textFormat">
      <enum>Qt::MarkdownText</enum>
     </property>
+    <property name="textInteractionFlags">
+     <set>Qt::NoTextInteraction</set>
+    </property>
    </widget>
    <widget class="Line" name="line_4">
     <property name="geometry">
@@ -355,19 +382,28 @@
        <property name="textFormat">
         <enum>Qt::MarkdownText</enum>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="backup_dateLlabel">
-       <property name="text">
-        <string>Date:</string>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="backup_date_label">
+       <property name="text">
+        <string>Date:</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="backup_itunes_ver_label">
        <property name="text">
         <string>iTunes version:</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::TextSelectableByMouse</set>
        </property>
       </widget>
      </item>
@@ -376,12 +412,18 @@
        <property name="text">
         <string>Encrypted:</string>
        </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="backup_passcode_set_label">
        <property name="text">
         <string>Passcode is set:</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::NoTextInteraction</set>
        </property>
       </widget>
      </item>
@@ -400,7 +442,32 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionAdd_backup"/>
+    <addaction name="actionExit"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit_2"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
+  <action name="actionAdd_backup">
+   <property name="text">
+    <string>Add backup</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="actionExit_2">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
