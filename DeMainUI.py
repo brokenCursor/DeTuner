@@ -2,8 +2,10 @@ import sys
 import os
 from ui.DeMainUILayout import DeMainUILayout
 from DeBackup import DeBackup, InvalidBackupException
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem
+from DeBackupHandler import DeBackupHandler
+from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog
 from PyQt5.QtGui import QIcon, QPixmap
+from easter_egg import *
 
 
 class DeMainUI(QMainWindow, DeMainUILayout):
@@ -20,6 +22,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.add_backup_button.clicked.connect(self.add_external_backup)
         self.backup_table.itemSelectionChanged.connect(
             self.update_selected_backup_info)
+        self.start_button.clicked.connect(self.extract)
 
     def import_default_backups(self):
         backup_paths = self.get_backup_list()
@@ -29,30 +32,45 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
     def update_selected_backup_info(self):
         # Get backup from list by index
-        index = self.backup_table.currentRow()
-        backup = self.__backups[index]
+        backup = self.get_selected_backup()
 
         # Fill in device info
-        self.device_name_label.setText('**' + backup.get_device_name() + '**')
-        self.model_label.setText("Model: " + backup.get_product_name())
+        self.device_name_label.setText('**' + backup.device_name() + '**')
+        self.model_label.setText("Model: " + backup.product_name())
         self.ios_version_label.setText(
-            "iOS Version: " + backup.get_ios_version())
-        self.serial_number_label.setText("S/N: " + backup.get_serial_number())
-        self.imei_label.setText("IMEI: " + backup.get_imei())
-        icon_filename = backup.get_product_type().replace(',', '')
+            "iOS Version: " + backup.ios_version())
+        self.serial_number_label.setText("S/N: " + backup.serial_number())
+        self.imei_label.setText("IMEI: " + backup.imei())
+        icon_filename = backup.product_type().replace(',', '')
         pixmap = QPixmap(f"./assets/device_icons/{icon_filename}", ).scaled(
             80, 130, aspectRatioMode=1)
         self.device_image.setPixmap(pixmap)
 
         # Fill in backup info
         self.backup_date_label.setText(
-            "Date: " + backup.get_last_backup_date())
+            "Date: " + backup.last_backup_date())
         self.backup_itunes_ver_label.setText(
-            "iTunes version: " + backup.get_itunes_version())
+            "iTunes version: " + backup.itunes_version())
         self.backup_is_encrypted_label.setText("Encrypted: " +
-                                               str(backup.get_is_encrypted()))
+                                               str(backup.is_encrypted()))
         self.backup_passcode_set_label.setText("Passcode set: " +
-                                               str(backup.get_is_passcode_set()))
+                                               str(backup.is_passcode_set()))
+
+        # Enable UI elements
+        self.start_button.setEnabled(True)
+        self.set_checkboxes_enabled(True)
+
+    def set_checkboxes_enabled(self, enable: bool = True):
+        ''' Enable/disable checkboxes '''
+
+        self.sms_checkbox.setEnabled(enable)
+        self.notes_checkbox.setEnabled(enable)
+        self.calendar_checkbox.setEnabled(enable)
+        self.contacts_checkbox.setEnabled(enable)
+        self.voicemail_checkbox.setEnabled(enable)
+        self.voice_memos_checkbox.setEnabled(enable)
+        self.camera_roll_checkbox.setEnabled(enable)
+        self.call_history_checkbox.setEnabled(enable)
 
     def get_backup_list(self) -> list:
         path = os.path.expanduser(
@@ -60,13 +78,14 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         backup_paths = [path + '\\' + b for b in os.listdir(path)]
         return backup_paths
 
-    def import_backup(self, path):
+    def import_backup(self, path: str):
+        ''' Import backup from path and add to __backups '''
+
         try:
-            backup = DeBackup(path)
-            if backup.get_backup_id() in [b.get_backup_id() for b in self.__backups]:
+            if path in [b.get_path() for b in self.__backups]:
                 self.show_info("This backup has already been added")
             else:
-                self.__backups.append(backup)
+                self.__backups.append(DeBackup(path))
         except InvalidBackupException as e:
             id = path.split('\\')[-1]
             self.show_error(
@@ -78,28 +97,31 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def update_table(self):
         self.backup_table.clear()
         for b in self.__backups:
-            item_text = b.get_display_name() + '\n' + b.get_last_backup_date()
-            icon_filename = b.get_product_type().replace(',', '')
+            item_text = b.display_name() + '\n' + b.last_backup_date()
+            icon_filename = b.product_type().replace(',', '')
             item_icon = QIcon(f"./assets/device_icons/{icon_filename}")
             self.backup_table.addItem(
                 QListWidgetItem(item_icon, item_text))
 
     def add_external_backup(self):
-        path = self.get_dir_path()
+        ''' Add backup from user-provided location '''
+
+        path = self.get_dir_path("Select backup directory")
         if path:
             try:
                 self.import_backup(path)
-            except:
-                self.show_error("Unable to import external backup")
+            except Exception as e:
+                self.show_error("Unable to import external backup", details=e)
             else:
                 self.update_table()
         else:
             self.show_warning("No backup selected!")
 
-    def get_dir_path(self) -> str | None:
+    def get_dir_path(self, title) -> str | None:
         ''' Return path to a directory '''
+
         path = QFileDialog.getExistingDirectory(
-            self, 'Select Backup Directory')
+            self, title)
         return path if path else None
 
     def show_message(self, message: str = "An unknown error ocurred!",
@@ -130,7 +152,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         msg = QMessageBox()
         msg.setIcon(icon)
-        # msg.setWindowIcon()
+        msg.setWindowIcon(QIcon('./assets/icon24'))
         msg.setText(message)
         if 'details' in kwargs:
             msg.setDetailedText(kwargs['details'])
@@ -145,18 +167,75 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         return func_result  # TODO: fix returning of clicked button
 
     def show_warning(self, message, **kwargs) -> None | str:
-        ''' A wrapper for show_message function'''
+        ''' A warning wrapper for show_message function'''
+
         return self.show_message(message, QMessageBox.Warning,
                                  'Warning', **kwargs)
 
     def show_error(self, message, **kwargs) -> None | str:
-        ''' A wrapper for show_message function'''
+        ''' An error wrapper for show_message function'''
+
         return self.show_message(message, QMessageBox.Critical,
                                  'Error!', **kwargs)
 
     def show_info(self, message, **kwargs) -> None | str:
+        ''' An info wrapper for show_message function'''
+
         return self.show_message(message, QMessageBox.Information,
                                  'Info', **kwargs)
+
+    def get_selected_backup(self) -> DeBackup | None:
+        ''' Get selected backup '''
+
+        index = self.backup_table.currentRow()
+        return self.__backups[index] if index != -1 else None
+
+    def get_passcode(self) -> tuple:
+        dialog = QInputDialog()
+        dialog.setTextEchoMode(QLineEdit.EchoMode.Password)
+        passcode, result = dialog.getText(
+            self, 'Enter passcode',
+            'This backup requires passcode for extraction',
+            QLineEdit.EchoMode.Password)
+        return passcode, result
+
+    def easter_egg(self, passcode):
+        pass
+
+    def extract(self):
+        # Get backup from table
+        backup = self.get_selected_backup()
+        if not backup:
+            self.show_warning("No backup selected!")
+            return
+
+        # Get passcode
+        if backup.is_passcode_set():
+            while True:
+                passcode, result = self.get_passcode()
+                if not result:
+                    self.show_info('Extraction canceled')
+                    return
+                elif passcode == '':
+                    self.show_warning('Empty passcode provided!')
+                else:
+                    break
+            self.easter_egg(passcode)
+
+        # Get output directory
+        output_dir = self.get_dir_path("Select output directory")
+        if not output_dir:
+            self.show_info('Extraction canceled')
+            return
+
+        # Extract data
+        handler = DeBackupHandler(backup, output_dir)
+        if backup.is_encrypted():
+            handler.decrypt(passcode)
+        #handler.extract_camera_roll()
+        #handler.extract_voice_memos()
+        handler.extract_contacts()
+            # Handler __must__ be deleted after usage for data protection purposes
 
 
 if __name__ == '__main__':

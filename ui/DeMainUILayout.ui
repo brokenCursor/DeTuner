@@ -352,7 +352,10 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="start_stop_button">
+   <widget class="QPushButton" name="start_button">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>460</x>
@@ -452,24 +455,30 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionAdd_backup"/>
-    <addaction name="actionExit"/>
+    <addaction name="action_add_backup"/>
+    <addaction name="action_export"/>
     <addaction name="separator"/>
-    <addaction name="actionExit_2"/>
+    <addaction name="action_exit"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
-  <action name="actionAdd_backup">
+  <action name="action_add_backup">
    <property name="text">
     <string>Add backup</string>
    </property>
-  </action>
-  <action name="actionExit">
-   <property name="text">
-    <string>Export</string>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
-  <action name="actionExit_2">
+  <action name="action_export">
+   <property name="text">
+    <string>Extract</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="action_exit">
    <property name="text">
     <string>Exit</string>
    </property>
