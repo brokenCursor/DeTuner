@@ -123,6 +123,7 @@ class EncryptedBackup:
             cur.execute("SELECT count(*) FROM Files;")
             file_count = cur.fetchone()[0]
             cur.close()
+            self._temp_manifest_db_conn.close()
             return file_count > 0
         except sqlite3.Error:
             return False
@@ -159,8 +160,10 @@ class EncryptedBackup:
         inner_key = self._keybag.unwrapKeyForClass(protection_class, encryption_key)
         # Find the encrypted version of the file on disk and decrypt it:
         filename_in_backup = os.path.join(self._backup_directory, file_id[:2], file_id)
+        print(filename_in_backup)
         with open(filename_in_backup, 'rb') as encrypted_file_filehandle:
             encrypted_data = encrypted_file_filehandle.read()
+            # print(encrypted_data)
         # Decrypt the file contents:
         decrypted_data = google_iphone_dataprotection.AESdecryptCBC(encrypted_data, inner_key)
         # Remove any padding introduced by the CBC encryption:
@@ -195,7 +198,7 @@ class EncryptedBackup:
         """
         # Ensure that we've initialised everything:
         if self._temp_manifest_db_conn is None:
-            self._decrypt_manifest_db_file()
+            self._temp_manifest_db_conn = sqlite3.connect(self._temp_decrypted_manifest_db_path)
         # Use Manifest.db to find the on-disk filename and file metadata, including the keys, for the file.
         # The metadata is contained in the 'file' column, as a binary PList file:
         try:
@@ -209,9 +212,11 @@ class EncryptedBackup:
             """
             cur.execute(query, (relative_path,))
             result = cur.fetchone()
-        except sqlite3.Error:
+        except sqlite3.Error as e:
+            print(e)
             return None
         file_id, file_bplist = result
+        self._temp_manifest_db_conn.close()
         # Decrypt the requested file:
         return self._decrypt_inner_file(file_id=file_id, file_bplist=file_bplist)
 
@@ -231,6 +236,7 @@ class EncryptedBackup:
         """
         # Get the decrypted bytes of the requested file:
         decrypted_data = self.extract_file_as_bytes(relative_path)
+        #print(decrypted_data)
         # Output them to disk:
         output_directory = os.path.dirname(output_filename)
         if output_directory:
@@ -238,6 +244,7 @@ class EncryptedBackup:
         if decrypted_data is not None:
             with open(output_filename, 'wb') as outfile:
                 outfile.write(decrypted_data)
+                outfile.close()
 
     def extract_files(self, *, relative_paths_like, output_folder):
         """

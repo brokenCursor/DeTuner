@@ -39,7 +39,6 @@ class DeBackupHandler:
             relativePath = file_data[0]
             file_type = file_data[1]
             try:
-                print(path)
                 if file_type == 1:
                     self.__enc_backup.extract_file(
                         relative_path=relativePath,
@@ -68,7 +67,6 @@ class DeBackupHandler:
                 try:
                     if file_type == 1:
                         new_path = relativePath.rsplit('/', 1)[-1]
-                        print(new_path)
                         self.__enc_backup.extract_file(
                             relative_path=relativePath,
                             output_filename=path + '/' + new_path)
@@ -82,6 +80,7 @@ class DeBackupHandler:
     def extract_contacts(self):
         path = self.__output_dir + '/Contacts'
         if self.__backup.is_encrypted():
+            # Find AddressBook database
             try:
                 conn = sqlite3.connect(self.__decrypted_manifest_db)
             except Exception as e:
@@ -91,9 +90,13 @@ class DeBackupHandler:
                     WHERE relativePath LIKE \'%AddressBook.sqlitedb\'
                     LIMIT 1'''
             c.execute(query)
+
+            # Temporarily save AddressBook database
             addr_db_path = path + '/AdressBook'
             self.__enc_backup.extract_file(relative_path=c.fetchone()[
                                            0], output_filename=addr_db_path)
+
+            # Exctract contacts
             try:
                 addr_db_conn = sqlite3.connect(addr_db_path)
             except Exception as e:
@@ -119,6 +122,8 @@ class DeBackupHandler:
                         FROM ABPerson INNER JOIN ABPersonFullTextSearch_content ON ABPerson.ROWID = ABPersonFullTextSearch_content.docid
                         ORDER BY ABPerson.First'''
             addr_db.execute(query)
+
+            # Write contacts to file
             header = ['ID', 'Dispaly Name', 'First Name', 'Second Name',
                       'Last Name', 'Nickname', 'Organization',
                       'Department', 'Job Title', 'Note', 'Birthday',
@@ -131,11 +136,28 @@ class DeBackupHandler:
                         '\t'.join([str(val).replace('\u202a', '').replace('\u2011', '-').
                                    replace('\u202c', '') for val in contact]) + '\n')
                 f.close()
+
+            # Close and delete temporary database
             addr_db_conn.close()
             os.remove(addr_db_path)
         else:
             # TODO: non-encrypted backups
             pass
+
+    def extract_call_history(self):
+        path = self.__output_dir + '/Call History'
+
+    def extract_calendar(self):
+        pass
+
+    def extract_notes(self):
+        pass
+
+    def extract_sms_imessage(self):
+        pass
+
+    def extract_voicemail(self):
+        pass
 
     def __del__(self):
         if self.__enc_backup:

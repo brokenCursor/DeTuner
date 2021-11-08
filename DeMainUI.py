@@ -1,10 +1,12 @@
 import sys
 import os
+from DeWorker import DeWorker
 from ui.DeMainUILayout import DeMainUILayout
 from DeBackup import DeBackup, InvalidBackupException
 from DeBackupHandler import DeBackupHandler
 from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog
 from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import QThreadPool
 from easter_egg import *
 
 
@@ -17,6 +19,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.setupUi(self)
         self.bind_buttons()
         self.import_default_backups()
+        self.__threadpool = QThreadPool().globalInstance()
 
     def bind_buttons(self):
         self.add_backup_button.clicked.connect(self.add_external_backup)
@@ -71,6 +74,19 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.voice_memos_checkbox.setEnabled(enable)
         self.camera_roll_checkbox.setEnabled(enable)
         self.call_history_checkbox.setEnabled(enable)
+
+    def get_checkboxes_states(self) -> dict:
+        states = {
+            'call_history': self.call_history_checkbox.isChecked(),
+            'calendar': self.calendar_checkbox.isChecked(),
+            'camera_roll': self.camera_roll_checkbox.isChecked(),
+            'contacts': self.contacts_checkbox.isChecked(),
+            'notes': self.notes_checkbox.isChecked(),
+            'sms': self.sms_checkbox.isChecked(),
+            'voice_memos': self.voice_memos_checkbox.isChecked(),
+            'voicemail': self.voicemail_checkbox.isChecked()
+        }
+        return states
 
     def get_backup_list(self) -> list:
         path = os.path.expanduser(
@@ -202,6 +218,9 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def easter_egg(self, passcode):
         pass
 
+    def handle_export_error(self, value, text):
+        pass
+
     def extract(self):
         # Get backup from table
         backup = self.get_selected_backup()
@@ -228,14 +247,49 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.show_info('Extraction canceled')
             return
 
+        # Disable UI
+        self.set_checkboxes_enabled(False)
+        self.start_button.setEnabled(False)
+
         # Extract data
+        settings = self.get_checkboxes_states()
         handler = DeBackupHandler(backup, output_dir)
         if backup.is_encrypted():
-            handler.decrypt(passcode)
-        #handler.extract_camera_roll()
-        #handler.extract_voice_memos()
-        handler.extract_contacts()
-            # Handler __must__ be deleted after usage for data protection purposes
+            worker = DeWorker(handler.decrypt(passcode))
+            # worker.signals.error.connect(self.handle_export_error)
+            self.__threadpool.start(worker)
+        self.__threadpool.waitForDone(-1)
+        if settings['camera_roll']:
+            worker = DeWorker(handler.extract_camera_roll)
+            # worker.signals.error.connect(self.handle_export_error)
+            self.__threadpool.start(worker)
+        if settings['voice_memos']:
+            worker = DeWorker(handler.extract_voice_memos)
+            # worker.signals.error.connect(self.handle_export_error)
+            self.__threadpool.start(worker)
+        if settings['contacts']:
+            worker = DeWorker(handler.extract_contacts)
+            # worker.signals.error.connect(self.handle_export_error)
+            self.__threadpool.start(worker)
+        if settings['calendar']:
+            handler.extract_calendar()
+        if settings['notes']:
+            handler.extract_notes()
+        if settings['sms']:
+            handler.extract_sms_imessage()
+        if settings['voicemail']:
+            handler.extract_voicemail()
+        if settings['call_history']:
+            handler.extract_call_history()
+        self.__threadpool.waitForDone(-1)
+        # Handler __must__ be deleted after usage for data protection purposes
+
+        # Show info
+        self.show_info("Extraction completed")
+
+        # Enable UI
+        self.set_checkboxes_enabled(True)
+        self.start_button.setEnabled(True)
 
 
 if __name__ == '__main__':
