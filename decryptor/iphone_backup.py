@@ -116,14 +116,14 @@ class EncryptedBackup:
             return False
         try:
             # Connect to the decrypted Manifest.db database if necessary:
-            if self._temp_manifest_db_conn is None:
-                self._temp_manifest_db_conn = sqlite3.connect(self._temp_decrypted_manifest_db_path)
+            self._temp_manifest_db_conn = sqlite3.connect(self._temp_decrypted_manifest_db_path)
             # Check that it has the expected table structure and a list of files:
             cur = self._temp_manifest_db_conn.cursor()
             cur.execute("SELECT count(*) FROM Files;")
             file_count = cur.fetchone()[0]
             cur.close()
             self._temp_manifest_db_conn.close()
+            del self._temp_manifest_db_conn
             return file_count > 0
         except sqlite3.Error:
             return False
@@ -160,10 +160,8 @@ class EncryptedBackup:
         inner_key = self._keybag.unwrapKeyForClass(protection_class, encryption_key)
         # Find the encrypted version of the file on disk and decrypt it:
         filename_in_backup = os.path.join(self._backup_directory, file_id[:2], file_id)
-        print(filename_in_backup)
         with open(filename_in_backup, 'rb') as encrypted_file_filehandle:
             encrypted_data = encrypted_file_filehandle.read()
-            # print(encrypted_data)
         # Decrypt the file contents:
         decrypted_data = google_iphone_dataprotection.AESdecryptCBC(encrypted_data, inner_key)
         # Remove any padding introduced by the CBC encryption:
@@ -197,12 +195,11 @@ class EncryptedBackup:
         :return: decrypted bytes of the file.
         """
         # Ensure that we've initialised everything:
-        if self._temp_manifest_db_conn is None:
-            self._temp_manifest_db_conn = sqlite3.connect(self._temp_decrypted_manifest_db_path)
+        temp_manifest_db_conn = sqlite3.connect(self._temp_decrypted_manifest_db_path)
         # Use Manifest.db to find the on-disk filename and file metadata, including the keys, for the file.
         # The metadata is contained in the 'file' column, as a binary PList file:
         try:
-            cur = self._temp_manifest_db_conn.cursor()
+            cur = temp_manifest_db_conn.cursor()
             query = """
                 SELECT fileID, file
                 FROM Files
@@ -216,7 +213,8 @@ class EncryptedBackup:
             print(e)
             return None
         file_id, file_bplist = result
-        self._temp_manifest_db_conn.close()
+        temp_manifest_db_conn.close()
+        del temp_manifest_db_conn
         # Decrypt the requested file:
         return self._decrypt_inner_file(file_id=file_id, file_bplist=file_bplist)
 
@@ -236,7 +234,6 @@ class EncryptedBackup:
         """
         # Get the decrypted bytes of the requested file:
         decrypted_data = self.extract_file_as_bytes(relative_path)
-        #print(decrypted_data)
         # Output them to disk:
         output_directory = os.path.dirname(output_filename)
         if output_directory:

@@ -20,6 +20,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.bind_buttons()
         self.import_default_backups()
         self.__threadpool = QThreadPool().globalInstance()
+        print(self.__threadpool.activeThreadCount())
 
     def bind_buttons(self):
         self.add_backup_button.clicked.connect(self.add_external_backup)
@@ -255,7 +256,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         settings = self.get_checkboxes_states()
         handler = DeBackupHandler(backup, output_dir)
         if backup.is_encrypted():
-            worker = DeWorker(handler.decrypt(passcode))
+            worker = DeWorker(handler.decrypt, passcode)
             # worker.signals.error.connect(self.handle_export_error)
             self.__threadpool.start(worker)
         self.__threadpool.waitForDone(-1)
@@ -281,9 +282,11 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             handler.extract_voicemail()
         if settings['call_history']:
             handler.extract_call_history()
-        self.__threadpool.waitForDone(-1)
-        # Handler __must__ be deleted after usage for data protection purposes
 
+        while self.__threadpool.activeThreadCount():
+            QApplication.processEvents()
+        # Handler __must__ be deleted after usage for data protection purposes
+        
         # Show info
         self.show_info("Extraction completed")
 
