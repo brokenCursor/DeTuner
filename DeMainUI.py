@@ -78,6 +78,13 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.camera_roll_checkbox.setEnabled(enable)
         self.call_history_checkbox.setEnabled(enable)
 
+    def set_ui_enabled(self, enabled: True):
+        self.set_checkboxes_enabled(enabled)
+        self.start_button.setEnabled(enabled)
+        self.add_backup_button.setEnabled(enabled)
+        self.backup_table.setEnabled(enabled)
+        self.menubar.setEnabled(enabled)
+
     def get_checkboxes_states(self) -> dict:
         states = {
             'call_history': self.call_history_checkbox.isChecked(),
@@ -224,8 +231,11 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def easter_egg(self, passcode):
         pass
 
-    def handle_export_error(self, value, text):
+    def handle_export_error(self, **kwargs):
         pass
+
+    def get_worker_progress(self, progress):
+        print(progress // self.__thread_count)
 
     def extract(self):
         # Get backup from table
@@ -254,50 +264,60 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             return
 
         # Disable UI
-        self.set_checkboxes_enabled(False)
-        self.start_button.setEnabled(False)
+        self.set_ui_enabled(False)
 
         # Extract data
         settings = self.get_checkboxes_states()
         handler = DeBackupHandler(backup, output_dir)
         if backup.is_encrypted():
             worker = DeWorker(handler.decrypt, passcode)
-            # worker.signals.error.connect(self.handle_export_error)
+            worker.signals.error.connect(self.handle_export_error)
             self.__threadpool.start(worker)
         self.__threadpool.waitForDone(-1)
-        if settings['camera_roll']:
-            worker = DeWorker(handler.extract_camera_roll)
-            # worker.signals.error.connect(self.handle_export_error)
-            self.__threadpool.start(worker)
-        if settings['voice_memos']:
-            worker = DeWorker(handler.extract_voice_memos)
-            # worker.signals.error.connect(self.handle_export_error)
-            self.__threadpool.start(worker)
-        if settings['contacts']:
-            worker = DeWorker(handler.extract_contacts)
-            # worker.signals.error.connect(self.handle_export_error)
-            self.__threadpool.start(worker)
-        if settings['calendar']:
-            handler.extract_calendar()
-        if settings['notes']:
-            handler.extract_notes()
-        if settings['sms']:
-            handler.extract_sms_imessage()
-        if settings['voicemail']:
-            handler.extract_voicemail()
-        if settings['call_history']:
-            handler.extract_call_history()
+
+        self.__thread_count = sum([item[1] * 1 for item in settings.items()])
+
+        def start_thread(func):
+            try:
+                worker = DeWorker(func)
+                worker.signals.error.connect(self.handle_export_error)
+                worker.signals.progress.connect(self.get_worker_progress)
+                self.__threadpool.start(worker)
+            except Exception as e:
+                self.show_error(
+                    "Critical error while starting thread", details=e)
+            else:
+                self.__thread_count += 1
+        try:
+            if settings['camera_roll']:
+                start_thread(handler.extract_camera_roll)
+            if settings['voice_memos']:
+                start_thread(handler.extract_voice_memos)
+            if settings['contacts']:
+                start_thread(handler.extract_contacts)
+            if settings['calendar']:
+                handler.extract_calendar()
+            if settings['notes']:
+                handler.extract_notes()
+            if settings['sms']:
+                handler.extract_sms_imessage()
+            if settings['voicemail']:
+                handler.extract_voicemail()
+            if settings['call_history']:
+                handler.extract_call_history()
+        except Exception as e:
+            self.show_error(
+                "Critical error while starting extraction", details=e)
 
         while self.__threadpool.activeThreadCount():
             QApplication.processEvents()
         # Handler __must__ be deleted after usage for data protection purposes
-        
+
         # Show info
         self.show_info("Extraction completed")
 
         # Enable UI
-        self.set_checkboxes_enabled(True)
-        self.start_button.setEnabled(True)
+        self.set_ui_enabled(True)
 
 
 if __name__ == '__main__':

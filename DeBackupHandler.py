@@ -10,7 +10,7 @@ class DeBackupHandler:
         self.__backup = backup
         self.__output_dir = output_dir + '/Backup_' + self.__backup.backup_id()
 
-    def decrypt(self, passcode):
+    def decrypt(self, passcode, **kwargs):
         ''' Decrypt backup with provided passcode '''
 
         try:
@@ -23,18 +23,36 @@ class DeBackupHandler:
         self.__decrypted_manifest_db = \
             self.__enc_backup._temp_decrypted_manifest_db_path
 
-    def extract_camera_roll(self):
+    def extract_camera_roll(self, **kwargs):
+        # Set output path 
         path = self.__output_dir + '/Camera Roll'
         if self.__backup.is_encrypted():
+            # Connect to Manifest.db
             try:
                 conn = sqlite3.connect(self.__decrypted_manifest_db)
             except Exception as e:
                 raise Exception(f"Unable to connect to database: {e}")
+            
+            # Get file list
             c = conn.cursor()
-            query = '''SELECT relativePath, flags FROM Files 
-                    WHERE Files.relativePath LIKE 'Media/DCIM/___APPLE/%.%' 
+            query = '''SELECT relativePath, flags FROM Files
+                    WHERE Files.relativePath LIKE 'Media/DCIM/___APPLE/%.%'
                     AND domain = "CameraRollDomain"'''
             c.execute(query)
+
+            # If progress callback provided
+            if 'progress_callback' in kwargs.keys():
+                # Get file count
+                count = conn.cursor()
+                count_query = '''SELECT count(*) FROM Files 
+                            WHERE Files.relativePath LIKE 'Media/DCIM/___APPLE/%.%' 
+                            AND domain = "CameraRollDomain"'''
+                count.execute(count_query)
+                file_count = count.fetchone()[0]
+                processed_files = 0
+                prev_progress = None
+            
+            # Extract files
         for file_data in c:
             relativePath = file_data[0]
             file_type = file_data[1]
@@ -45,11 +63,19 @@ class DeBackupHandler:
                         output_filename=path + '/' + relativePath)
             except Exception as e:
                 raise Exception(f"Unable to extract file {relativePath}: {e}")
+            
+            # If progress callback provided, emit progress
+            if 'progress_callback' in kwargs.keys():
+                processed_files += 1
+                progress = processed_files * 100 // file_count
+                if prev_progress != progress:
+                    prev_progress = progress
+                    kwargs['progress_callback'].emit(progress)
         else:
             # TODO: non-encrypted backups
             pass
 
-    def extract_voice_memos(self):
+    def extract_voice_memos(self, **kwargs):
         path = self.__output_dir + '/Voice Memos'
         if self.__backup.is_encrypted():
             try:
@@ -78,7 +104,7 @@ class DeBackupHandler:
             # TODO: non-encrypted backups
             pass
 
-    def extract_contacts(self):
+    def extract_contacts(self, **kwargs):
         path = self.__output_dir + '/Contacts'
         if self.__backup.is_encrypted():
             # Find AddressBook database
