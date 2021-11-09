@@ -1,0 +1,4 @@
+biplist 
+pycryptodome
+plistlib
+PyQT5

@@ -19,8 +19,9 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.setupUi(self)
         self.bind_buttons()
         self.import_default_backups()
+        if not self.__backups:
+            self.show_warning("No backups found!")
         self.__threadpool = QThreadPool().globalInstance()
-        print(self.__threadpool.activeThreadCount())
 
     def bind_buttons(self):
         self.add_backup_button.clicked.connect(self.add_external_backup)
@@ -30,8 +31,9 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
     def import_default_backups(self):
         backup_paths = self.get_backup_list()
-        for path in backup_paths:
-            self.import_backup(path)
+        if backup_paths:
+            for path in backup_paths:
+                self.import_backup(path)
         self.update_table()
 
     def update_selected_backup_info(self):
@@ -89,11 +91,14 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         }
         return states
 
-    def get_backup_list(self) -> list:
+    def get_backup_list(self) -> list | None:
         path = os.path.expanduser(
             '~') + r'\AppData\Roaming\Apple Computer\MobileSync\Backup'
-        backup_paths = [path + '\\' + b for b in os.listdir(path)]
-        return backup_paths
+        if os.path.exists(path):
+            backup_paths = [path + '\\' + b for b in os.listdir(path)]
+            return backup_paths
+        else:
+            return None
 
     def import_backup(self, path: str):
         ''' Import backup from path and add to __backups '''

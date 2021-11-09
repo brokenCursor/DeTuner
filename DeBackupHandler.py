@@ -61,6 +61,7 @@ class DeBackupHandler:
                     WHERE Files.relativePath 
                     LIKE \'%Recordings/%.m4a\''''
             c.execute(query)
+            file_count = c.rowcount
             for file_data in c:
                 relativePath = file_data[0]
                 file_type = file_data[1]
