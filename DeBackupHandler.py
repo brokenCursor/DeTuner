@@ -12,7 +12,7 @@ class DeBackupHandler:
 
     def decrypt(self, passcode, **kwargs):
         ''' Decrypt backup with provided passcode '''
-
+    
         try:
             self.__enc_backup = EncryptedBackup(
                 backup_directory=self.__backup.get_path(), passphrase=passcode)

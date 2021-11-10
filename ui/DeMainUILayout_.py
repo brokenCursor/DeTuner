@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'd:\Проекты\DeTuner\ui\DeMainUILayout.ui'
+# Form implementation generated from reading ui file 'd:\Проекты\DeTuner\ui\main.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -14,14 +14,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class DeMainUILayout(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(680, 474)
+        MainWindow.resize(680, 460)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("d:\\Проекты\\DeTuner\\ui\\../assets/icon24.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("./assets/icon24.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -182,9 +182,6 @@ class DeMainUILayout(object):
         self.backup_passcode_set_label.setObjectName("backup_passcode_set_label")
         self.backup_info_layout.addWidget(self.backup_passcode_set_label)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setEnabled(True)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 680, 21))

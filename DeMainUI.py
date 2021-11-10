@@ -4,7 +4,7 @@ from DeWorker import DeWorker
 from ui.DeMainUILayout import DeMainUILayout
 from DeBackup import DeBackup, InvalidBackupException
 from DeBackupHandler import DeBackupHandler
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog
+from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QThreadPool
 from easter_egg import *
@@ -19,6 +19,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.setupUi(self)
         self.bind_buttons()
         self.import_default_backups()
+        self.progress_bar = 
+        self.statusbar.add
         if not self.__backups:
             self.show_warning("No backups found!")
         self.__threadpool = QThreadPool().globalInstance()
@@ -27,7 +29,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.add_backup_button.clicked.connect(self.add_external_backup)
         self.backup_table.itemSelectionChanged.connect(
             self.update_selected_backup_info)
-        self.start_button.clicked.connect(self.extract)
+        self.start_button.clicked.connect(self.start_extraction)
 
     def import_default_backups(self):
         backup_paths = self.get_backup_list()
@@ -237,7 +239,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def get_worker_progress(self, progress):
         print(progress // self.__thread_count)
 
-    def extract(self):
+    def start_extraction(self):
         # Get backup from table
         backup = self.get_selected_backup()
         if not backup:
