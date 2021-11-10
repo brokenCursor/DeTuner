@@ -19,8 +19,9 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.setupUi(self)
         self.bind_buttons()
         self.import_default_backups()
-        self.progress_bar = 
-        self.statusbar.add
+        self.progress_bar = QProgressBar()
+        self.statusBar.addWidget(self.progress_bar)
+        self.progress_bar.hide()
         if not self.__backups:
             self.show_warning("No backups found!")
         self.__threadpool = QThreadPool().globalInstance()
