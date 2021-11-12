@@ -19,9 +19,12 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.setupUi(self)
         self.bind_buttons()
         self.import_default_backups()
+
+        # insert progress_bar into status_bar
         self.progress_bar = QProgressBar()
-        self.statusBar.addWidget(self.progress_bar)
+        self.status_bar.addPermanentWidget(self.progress_bar)
         self.progress_bar.hide()
+
         if not self.__backups:
             self.show_warning("No backups found!")
         self.__threadpool = QThreadPool().globalInstance()
@@ -238,7 +241,14 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         pass
 
     def get_worker_progress(self, progress):
-        print(progress // self.__thread_count)
+        self.progress_bar.setValue((progress // self.__thread_count))
+
+    def finish_thread(self):
+        if not self.__threadpool.activeThreadCount():
+            self.show_info("Extraction completed")
+            self.progress_bar.hide()
+            self.set_ui_enabled(True)
+            del self.__handler
 
     def start_extraction(self):
         # Get backup from table
@@ -249,6 +259,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         # Get passcode
         if backup.is_passcode_set():
+            #self.statusbar
             while True:
                 passcode, result = self.get_passcode()
                 if not result:
@@ -270,14 +281,14 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.set_ui_enabled(False)
 
         # Extract data
+        self.progress_bar.show()
         settings = self.get_checkboxes_states()
-        handler = DeBackupHandler(backup, output_dir)
+        self.__handler = DeBackupHandler(backup, output_dir)
         if backup.is_encrypted():
-            worker = DeWorker(handler.decrypt, passcode)
+            worker = DeWorker(self.__handler.decrypt, passcode)
             worker.signals.error.connect(self.handle_export_error)
             self.__threadpool.start(worker)
-        self.__threadpool.waitForDone(-1)
-
+        self.__threadpool.waitForDone(-1)   
         self.__thread_count = sum([item[1] * 1 for item in settings.items()])
 
         def start_thread(func):
@@ -285,42 +296,32 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 worker = DeWorker(func)
                 worker.signals.error.connect(self.handle_export_error)
                 worker.signals.progress.connect(self.get_worker_progress)
+                worker.signals.finished.connect(self.finish_thread)
                 self.__threadpool.start(worker)
             except Exception as e:
                 self.show_error(
                     "Critical error while starting thread", details=e)
-            else:
-                self.__thread_count += 1
+
         try:
             if settings['camera_roll']:
-                start_thread(handler.extract_camera_roll)
+                start_thread(self.__handler.extract_camera_roll)
             if settings['voice_memos']:
-                start_thread(handler.extract_voice_memos)
+                start_thread(self.__handler.extract_voice_memos)
             if settings['contacts']:
-                start_thread(handler.extract_contacts)
+                start_thread(self.__handler.extract_contacts)
             if settings['calendar']:
-                handler.extract_calendar()
+                self.__handler.extract_calendar()
             if settings['notes']:
-                handler.extract_notes()
+                self.__handler.extract_notes()
             if settings['sms']:
-                handler.extract_sms_imessage()
+                self.__handler.extract_sms_imessage()
             if settings['voicemail']:
-                handler.extract_voicemail()
+                self.__handler.extract_voicemail()
             if settings['call_history']:
-                handler.extract_call_history()
+                self.__handler.extract_call_history()
         except Exception as e:
             self.show_error(
                 "Critical error while starting extraction", details=e)
-
-        while self.__threadpool.activeThreadCount():
-            QApplication.processEvents()
-        # Handler __must__ be deleted after usage for data protection purposes
-
-        # Show info
-        self.show_info("Extraction completed")
-
-        # Enable UI
-        self.set_ui_enabled(True)
 
 
 if __name__ == '__main__':
