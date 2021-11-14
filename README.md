@@ -2,6 +2,6 @@
 
 TODO: write a decent readme
 
-Icons are from https://github.com/idolpx/iOSDump
+Icons from https://ipsw.me
 
 Decryption implementation from https://github.com/jsharkey13/iphone_backup_decrypt

@@ -57,7 +57,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             "iOS Version: " + backup.ios_version())
         self.serial_number_label.setText("S/N: " + backup.serial_number())
         self.imei_label.setText("IMEI: " + backup.imei())
-        icon_filename = backup.product_type().replace(',', '')
+        icon_filename = backup.product_type()
         pixmap = QPixmap(f"./assets/device_icons/{icon_filename}", ).scaled(
             80, 130, aspectRatioMode=1)
         self.device_image.setPixmap(pixmap)
@@ -137,7 +137,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.backup_table.clear()
         for b in self.__backups:
             item_text = b.display_name() + '\n' + b.last_backup_date()
-            icon_filename = b.product_type().replace(',', '')
+            icon_filename = b.product_type()
             item_icon = QIcon(f"./assets/device_icons/{icon_filename}")
             self.backup_table.addItem(
                 QListWidgetItem(item_icon, item_text))
@@ -338,7 +338,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             if settings['contacts']:
                 start_thread(self.__handler.extract_contacts)
             if settings['calendar']:
-                self.__handler.extract_calendar()
+                start_thread(self.__handler.extract_calendar)
             if settings['notes']:
                 start_thread(self.__handler.extract_notes)
             if settings['sms']:
