@@ -22,7 +22,7 @@ class DeMainUILayout(object):
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMaximumSize(QtCore.QSize(680, 13123))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("d:\\projects\\DeTuner\\ui\\../assets/icon24.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("../assets/icon24.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")

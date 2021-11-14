@@ -250,8 +250,6 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.__progress[name] += progress - self.__progress[name]
         else:
             self.__progress[name] = progress
-        print(sum([item[1] for item in self.__progress.items()]) //
-              self.__thread_count)
         self.progress_bar.setValue(
             sum([item[1] for item in self.__progress.items()]) // self.__thread_count)
 
@@ -314,7 +312,6 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             while self.__threadpool.activeThreadCount():
                 QApplication.processEvents()
 
-            print(decryption_result)
             if not decryption_result:
                 self.show_error(
                     "Unable to decrypt backup: incorrect password?")
