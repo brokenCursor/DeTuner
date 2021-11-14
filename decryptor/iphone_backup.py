@@ -80,15 +80,12 @@ class EncryptedBackup:
         self._temporary_folder = tempfile.mkdtemp()
         self._temp_decrypted_manifest_db_path = os.path.join(self._temporary_folder, 'Manifest.db')
         # We can keep a connection to the index SQLite database open:
-        self._temp_manifest_db_conn = None
 
     def __del__(self):
         self._cleanup()
 
     def _cleanup(self):
         try:
-            if self._temp_manifest_db_conn is not None:
-                self._temp_manifest_db_conn.close()
             shutil.rmtree(self._temporary_folder)
         except Exception:
             print("WARN: Cleanup failed. You may want to delete the decrypted temporary file found at:")
@@ -116,14 +113,13 @@ class EncryptedBackup:
             return False
         try:
             # Connect to the decrypted Manifest.db database if necessary:
-            self._temp_manifest_db_conn = sqlite3.connect(self._temp_decrypted_manifest_db_path)
+            temp_manifest_db_conn = sqlite3.connect(self._temp_decrypted_manifest_db_path)
             # Check that it has the expected table structure and a list of files:
-            cur = self._temp_manifest_db_conn.cursor()
+            cur = temp_manifest_db_conn.cursor()
             cur.execute("SELECT count(*) FROM Files;")
             file_count = cur.fetchone()[0]
             cur.close()
-            self._temp_manifest_db_conn.close()
-            del self._temp_manifest_db_conn
+            temp_manifest_db_conn.close()
             return file_count > 0
         except sqlite3.Error:
             return False
@@ -170,9 +166,12 @@ class EncryptedBackup:
     def test_decryption(self):
         """Validate that the backup can be decrypted successfully."""
         # Ensure that we've initialised everything:
-        if self._temp_manifest_db_conn is None:
+        try:
             self._decrypt_manifest_db_file()
-        return True
+        except:
+            raise
+        else:
+            return True
 
     def save_manifest_file(self, output_filename):
         """Save a permanent copy of the decrypted Manifest SQLite database."""
@@ -242,48 +241,3 @@ class EncryptedBackup:
             with open(output_filename, 'wb') as outfile:
                 outfile.write(decrypted_data)
                 outfile.close()
-
-    def extract_files(self, *, relative_paths_like, output_folder):
-        """
-        Decrypt files matching a relative path query and output them to a folder.
-
-        This method is not really designed to match very loose relative paths like '%' or '%.jpg'.
-        Since the folder structure is not preserved, files may be overwritten and/or unclear in origin.
-        Use very generic relative path matching at your own risk.
-
-        :param relative_paths_like:
-            An iOS 'relativePath' of the files to be decrypted, containing '%' or '_' SQL LIKE wildcards.
-            Common relative path wildcards are provided by the 'RelativePathsLike' class, otherwise these can be found
-            by opening the decrypted Manifest.db file and examining the Files table.
-        :param output_folder:
-            The folder to write output files into. Files will be named with their internal iOS filenames and will
-            overwrite anything in the output folder with that name.
-        """
-        # Ensure that we've initialised everything:
-        if self._temp_manifest_db_conn is None:
-            self._decrypt_manifest_db_file()
-        # Use Manifest.db to find the on-disk filename(s) and file metadata, including the keys, for the file(s).
-        # The metadata is contained in the 'file' column, as a binary PList file; the filename in 'relativePath':
-        try:
-            cur = self._temp_manifest_db_conn.cursor()
-            query = """
-                SELECT fileID, relativePath, file
-                FROM Files
-                WHERE relativePath LIKE ?
-                ORDER BY domain, relativePath;
-            """
-            cur.execute(query, (relative_paths_like,))
-            results = cur.fetchall()
-        except sqlite3.Error:
-            return None
-        # Ensure output destination exists then loop through matches:
-        os.makedirs(output_folder, exist_ok=True)
-        for file_id, matched_relative_path, file_bplist in results:
-            filename = os.path.basename(matched_relative_path)
-            output_path = os.path.join(output_folder, filename)
-            # Decrypt the file:
-            decrypted_data = self._decrypt_inner_file(file_id=file_id, file_bplist=file_bplist)
-            # Output to disk:
-            if decrypted_data is not None:
-                with open(output_path, 'wb') as outfile:
-                    outfile.write(decrypted_data)

@@ -12,18 +12,22 @@ from easter_egg import *
 
 class DeMainUI(QMainWindow, DeMainUILayout):
 
-    __backups = []
-
     def __init__(self):
+        # Setup UI
         super().__init__()
         self.setupUi(self)
-        self.bind_buttons()
-        self.import_default_backups()
 
-        # insert progress_bar into status_bar
+        # Insert progress_bar into status_bar
         self.progress_bar = QProgressBar()
         self.status_bar.addPermanentWidget(self.progress_bar)
         self.progress_bar.hide()
+        self.bind_buttons()
+
+        # Define important variables
+        self.__backups = []
+        self.__progress = {}
+
+        self.import_default_backups()
 
         if not self.__backups:
             self.show_warning("No backups found!")
@@ -237,18 +241,27 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def easter_egg(self, passcode):
         pass
 
-    def handle_export_error(self, **kwargs):
+    def handle_export_error(self, *args, **kwargs):
         pass
 
-    def get_worker_progress(self, progress):
-        self.progress_bar.setValue((progress // self.__thread_count))
+    def get_worker_progress(self, data):
+        name, progress = data[0], data[1]
+        if name in self.__progress.keys():
+            self.__progress[name] += progress - self.__progress[name]
+        else:
+            self.__progress[name] = progress
+        print(sum([item[1] for item in self.__progress.items()]) //
+              self.__thread_count)
+        self.progress_bar.setValue(
+            sum([item[1] for item in self.__progress.items()]) // self.__thread_count)
 
-    def finish_thread(self):
-        if not self.__threadpool.activeThreadCount():
-            self.show_info("Extraction completed")
-            self.progress_bar.hide()
-            self.set_ui_enabled(True)
+    def finish_extraction(self, force: bool = False):
+        if not self.__threadpool.activeThreadCount() or force:
             del self.__handler
+            self.progress_bar.reset()
+            self.progress_bar.hide()
+            self.show_info("Extraction completed")
+            self.set_ui_enabled(True)
 
     def start_extraction(self):
         # Get backup from table
@@ -259,7 +272,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         # Get passcode
         if backup.is_passcode_set():
-            #self.statusbar
+            # self.statusbar
             while True:
                 passcode, result = self.get_passcode()
                 if not result:
@@ -285,10 +298,28 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         settings = self.get_checkboxes_states()
         self.__handler = DeBackupHandler(backup, output_dir)
         if backup.is_encrypted():
+            decryption_result = None
+
+            def get_decryption_result(result: bool):
+                nonlocal decryption_result
+                decryption_result = result
+
             worker = DeWorker(self.__handler.decrypt, passcode)
             worker.signals.error.connect(self.handle_export_error)
+            worker.signals.result.connect(get_decryption_result)
+
             self.__threadpool.start(worker)
-        self.__threadpool.waitForDone(-1)   
+
+            # Yes, that's not how it supposed to be done, but it works
+            while self.__threadpool.activeThreadCount():
+                QApplication.processEvents()
+
+            print(decryption_result)
+            if not decryption_result:
+                self.show_error(
+                    "Unable to decrypt backup: incorrect password?")
+                self.finish_extraction(force=True)
+                return
         self.__thread_count = sum([item[1] * 1 for item in settings.items()])
 
         def start_thread(func):
@@ -296,7 +327,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 worker = DeWorker(func)
                 worker.signals.error.connect(self.handle_export_error)
                 worker.signals.progress.connect(self.get_worker_progress)
-                worker.signals.finished.connect(self.finish_thread)
+                worker.signals.finished.connect(self.finish_extraction)
                 self.__threadpool.start(worker)
             except Exception as e:
                 self.show_error(
@@ -312,13 +343,13 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             if settings['calendar']:
                 self.__handler.extract_calendar()
             if settings['notes']:
-                self.__handler.extract_notes()
+                start_thread(self.__handler.extract_notes)
             if settings['sms']:
                 self.__handler.extract_sms_imessage()
             if settings['voicemail']:
                 self.__handler.extract_voicemail()
             if settings['call_history']:
-                self.__handler.extract_call_history()
+                start_thread(self.__handler.extract_call_history)
         except Exception as e:
             self.show_error(
                 "Critical error while starting extraction", details=e)
