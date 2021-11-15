@@ -39,6 +39,9 @@
       <height>41</height>
      </rect>
     </property>
+    <property name="statusTip">
+     <string>Import backup from non-iTunes directory</string>
+    </property>
     <property name="text">
      <string>Add backup</string>
     </property>
@@ -51,6 +54,9 @@
       <width>260</width>
       <height>371</height>
      </rect>
+    </property>
+    <property name="statusTip">
+     <string>Table of imported backups</string>
     </property>
     <property name="horizontalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -83,6 +89,9 @@
       <height>130</height>
      </rect>
     </property>
+    <property name="statusTip">
+     <string>Device icon</string>
+    </property>
     <property name="text">
      <string>SELECT BACKUP</string>
     </property>
@@ -110,6 +119,9 @@
          <pointsize>14</pointsize>
         </font>
        </property>
+       <property name="statusTip">
+        <string>User-specified device name</string>
+       </property>
        <property name="text">
         <string>**Device Name**</string>
        </property>
@@ -123,6 +135,9 @@
      </item>
      <item>
       <widget class="QLabel" name="model_label">
+       <property name="statusTip">
+        <string>Model name</string>
+       </property>
        <property name="text">
         <string>Model:</string>
        </property>
@@ -133,6 +148,9 @@
      </item>
      <item>
       <widget class="QLabel" name="ios_version_label">
+       <property name="statusTip">
+        <string>iOS version</string>
+       </property>
        <property name="text">
         <string>iOS Version:</string>
        </property>
@@ -143,6 +161,9 @@
      </item>
      <item>
       <widget class="QLabel" name="serial_number_label">
+       <property name="statusTip">
+        <string>Serial Nubmer</string>
+       </property>
        <property name="text">
         <string>Serial Number:</string>
        </property>
@@ -153,6 +174,9 @@
      </item>
      <item>
       <widget class="QLabel" name="imei_label">
+       <property name="statusTip">
+        <string>IMEI</string>
+       </property>
        <property name="text">
         <string>IMEI:</string>
        </property>
@@ -217,6 +241,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="statusTip">
+        <string>Extract call history?</string>
+       </property>
        <property name="text">
         <string>Call History</string>
        </property>
@@ -233,6 +260,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="statusTip">
+        <string>Extract calendar data?</string>
+       </property>
        <property name="text">
         <string>Calendar</string>
        </property>
@@ -245,6 +275,9 @@
       <widget class="QCheckBox" name="camera_roll_checkbox">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="statusTip">
+        <string>Extract Camera Roll?</string>
        </property>
        <property name="text">
         <string>Camera Roll</string>
@@ -259,6 +292,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="statusTip">
+        <string>Extract contacts?</string>
+       </property>
        <property name="text">
         <string>Contacts</string>
        </property>
@@ -271,6 +307,9 @@
       <widget class="QCheckBox" name="notes_checkbox">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="statusTip">
+        <string>Extract notes?</string>
        </property>
        <property name="text">
         <string>Notes</string>
@@ -285,6 +324,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="statusTip">
+        <string>Extract SMS &amp; iMessage message history?</string>
+       </property>
        <property name="text">
         <string>SMS &amp;&amp;  iMessage</string>
        </property>
@@ -298,6 +340,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="statusTip">
+        <string>Extract Voice Memos?</string>
+       </property>
        <property name="text">
         <string>Voice Memos</string>
        </property>
@@ -310,6 +355,9 @@
       <widget class="QCheckBox" name="voicemail_checkbox">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="statusTip">
+        <string>Extract voicemail?</string>
        </property>
        <property name="text">
         <string>Voicemail Messages</string>
@@ -370,6 +418,9 @@
       <height>41</height>
      </rect>
     </property>
+    <property name="statusTip">
+     <string>Start extraction!</string>
+    </property>
     <property name="text">
      <string>Start!</string>
     </property>
@@ -404,6 +455,9 @@
      </item>
      <item>
       <widget class="QLabel" name="backup_date_label">
+       <property name="statusTip">
+        <string>Date of last backup</string>
+       </property>
        <property name="text">
         <string>Date:</string>
        </property>
@@ -414,6 +468,9 @@
      </item>
      <item>
       <widget class="QLabel" name="backup_itunes_ver_label">
+       <property name="statusTip">
+        <string>iTunes version used for backup</string>
+       </property>
        <property name="text">
         <string>iTunes version:</string>
        </property>
@@ -424,6 +481,9 @@
      </item>
      <item>
       <widget class="QLabel" name="backup_is_encrypted_label">
+       <property name="statusTip">
+        <string>Was backup encrypted?</string>
+       </property>
        <property name="text">
         <string>Encrypted:</string>
        </property>
@@ -434,6 +494,9 @@
      </item>
      <item>
       <widget class="QLabel" name="backup_passcode_set_label">
+       <property name="statusTip">
+        <string>Was passcode set?</string>
+       </property>
        <property name="text">
         <string>Passcode is set:</string>
        </property>
@@ -474,24 +537,42 @@
    <addaction name="menuFile"/>
   </widget>
   <action name="action_add_backup">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Add backup</string>
+   </property>
+   <property name="statusTip">
+    <string>Import backup from non-iTunes directory</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
    </property>
   </action>
   <action name="action_export">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Extract</string>
+   </property>
+   <property name="statusTip">
+    <string>Start extraction!</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
    </property>
   </action>
   <action name="action_exit">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Exit</string>
+   </property>
+   <property name="statusTip">
+    <string>Quit DeTuner</string>
    </property>
   </action>
  </widget>

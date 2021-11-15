@@ -419,6 +419,10 @@ class DeBackupHandler:
                         prev_progress = progress
                         kwargs['progress_callback'].emit(
                             ('notes', progress))
+            
+            if 'progress_callback' in kwargs.keys() and processed_files == 0:
+                kwargs['progress_callback'].emit(
+                            ('notes', 100))
 
             # Close and delete temporary database
             notes_db_conn.close()
@@ -428,7 +432,7 @@ class DeBackupHandler:
             pass
 
     def extract_sms_imessage(self, **kwargs):
-        path = self.__output_dir + 'SMS & iMessage'
+        path = self.__output_dir + '/SMS & iMessage'
         if self.__backup.is_encrypted():
             # Find SMS database
             try:
@@ -527,17 +531,16 @@ class DeBackupHandler:
                         filename = file_path.split('/')[-1]
                         if file_path.startswith('~'):
                             file_path = file_path.lstrip('~/')
-                            print(file_path)
                             self.__enc_backup.extract_file(relative_path=file_path,
                                                            output_filename=attachments_path
                                                            + '/' + filename)
-                if 'progress_callback' in kwargs.keys():
-                    processed_messages += 1
-                    progress = processed_messages * 100 // msg_count
-                    if prev_progress != progress:
-                        prev_progress = progress
-                        kwargs['progress_callback'].emit(
-                            ('sms_imessage', progress))
+                    if 'progress_callback' in kwargs.keys():
+                        processed_messages += 1
+                        progress = processed_messages * 100 // msg_count
+                        if prev_progress != progress:
+                            prev_progress = progress
+                            kwargs['progress_callback'].emit(
+                                ('sms_imessage', progress))
 
             sms_db_conn.close()
             os.remove(sms_db_path)
@@ -631,6 +634,11 @@ class DeBackupHandler:
                         prev_progress = progress
                         kwargs['progress_callback'].emit(
                             ('voicemail', progress))
+            
+            if 'progress_callback' in kwargs.keys() and processed_files == 0:
+                kwargs['progress_callback'].emit(
+                            ('voicemail', 100))
+
             voicemail_db_conn.close()
             os.remove(voicemail_db_path)
         else:

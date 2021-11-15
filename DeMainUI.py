@@ -22,6 +22,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.status_bar.addPermanentWidget(self.progress_bar)
         self.progress_bar.hide()
         self.bind_buttons()
+        self.bind_actions()
 
         # Define important variables
         self.__backups = []
@@ -38,6 +39,11 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.backup_table.itemSelectionChanged.connect(
             self.update_selected_backup_info)
         self.start_button.clicked.connect(self.start_extraction)
+
+    def bind_actions(self):
+        self.action_add_backup.triggered.connect(self.add_external_backup)
+        self.action_export.triggered.connect(self.start_extraction)
+        self.action_exit.triggered.connect(sys.exit)
 
     def import_default_backups(self):
         backup_paths = self.get_backup_list()
@@ -262,6 +268,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.set_ui_enabled(True)
 
     def start_extraction(self):
+
         # Get backup from table
         backup = self.get_selected_backup()
         if not backup:
@@ -350,7 +357,6 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         except Exception as e:
             self.show_error(
                 "Critical error while starting extraction", details=e)
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
