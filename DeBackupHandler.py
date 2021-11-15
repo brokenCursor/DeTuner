@@ -427,36 +427,181 @@ class DeBackupHandler:
             # TODO: non-encrypted backups
             pass
 
-    def extract_sms_imessage(self):
-        pass
-
-    def extract_voicemail(self, **kwargs):
-        path = self.__output_dir + '/Voicemail'
+    def extract_sms_imessage(self, **kwargs):
+        path = self.__output_dir + 'SMS & iMessage'
         if self.__backup.is_encrypted():
+            # Find SMS database
             try:
                 conn = sqlite3.connect(self.__decrypted_manifest_db)
             except Exception as e:
                 raise Exception(f"Unable to connect to database: {e}")
             c = conn.cursor()
-            query = '''SELECT relativePath, flags FROM Files 
-                    WHERE Files.relativePath 
-                    LIKE \'%Recordings/%.m4a\''''
+            query = '''SELECT relativePath FROM Files 
+                    WHERE relativePath LIKE \'%sms.db\'
+                    LIMIT 1'''
             c.execute(query)
 
+            # Temporarily save SMS database
+            sms_db_path = path + '/SMS'
+            self.__enc_backup.extract_file(relative_path=c.fetchone()[0],
+                                           output_filename=sms_db_path)
+
+            # Connect to SMS db
+            try:
+                sms_db_conn = sqlite3.connect(sms_db_path)
+            except Exception as e:
+                raise Exception(f"Unable to connect to SMS database: {e}")
+
+            # Get chat list
+            chat_list = sms_db_conn.cursor()
+            query = '''SELECT DISTINCT chat.ROWID, 
+                    handle.id,
+                    handle.uncanonicalized_id,
+                    handle.service
+                    FROM chat
+                    INNER JOIN handle ON handle.ROWID = chat.ROWID'''
+            chat_list.execute(query)
+
             if 'progress_callback' in kwargs.keys():
-                # Get file count
+                # Get message count
+                count = sms_db_conn.cursor()
+                query = '''SELECT count(*) FROM message'''
+                count.execute(query)
+                msg_count = count.fetchone()[0]
+                processed_messages = 0
+                prev_progress = 0
+
+            for chat in chat_list:
+                # Extract chat info
+                chat_id, handle_id, handle_raw_id, service = chat
+                # Get messages in chat
+                messages = sms_db_conn.cursor()
+                query = '''SELECT chat_message_join.message_id,
+                        message.text,
+                        message.is_from_me,
+                        datetime(message.date+978307200, 'unixepoch', 'localtime'),
+                        datetime(message.date_delivered+978307200, 'unixepoch', 'localtime'),
+                        datetime(message.date_read+978307200, 'unixepoch', 'localtime')
+                        FROM chat_message_join
+                        LEFT JOIN message ON message.ROWID = chat_message_join.message_id
+                        WHERE chat_message_join.chat_id = ?'''
+                messages.execute(query, [chat_id])
+
+                # Create chat directory
+                chat_path = path + \
+                    f'/{handle_raw_id if handle_raw_id else handle_id} ({service})'
+                os.makedirs(chat_path)
+                # Create attachments directory
+                attachments_path = chat_path + '/Attachments'
+                os.makedirs(attachments_path)
+
+                # Save messages
+
+                for msg in messages:
+                    # Extract message data
+                    msg_id, text, is_from_me, date, date_delivered, date_read = msg
+
+                    # Generate message string
+                    msg_string = f'ID: {msg_id}\n'
+                    msg_string = 'From: me\n' if is_from_me else f'From: {handle_id}\n'
+                    if date:
+                        msg_string += f'Date: {date}\n'
+                    msg_string += f'Delivered: {date_delivered}\n'
+                    msg_string += f'Read: {date_read}\n'
+                    msg_string += f'-----------\n{text}\n\n'
+
+                    # Write to file
+                    with open(chat_path + '/chat_history.txt', 'a', encoding='UTF-16') as f:
+                        f.write(msg_string)
+                    f.close()
+
+                    # Extract message attachments
+                    attachments = sms_db_conn.cursor()
+                    query = '''SELECT attachment.filename
+                            FROM attachment
+                            LEFT JOIN message_attachment_join on attachment.ROWID = message_attachment_join.attachment_id
+                            WHERE message_attachment_join.message_id = ?'''
+                    attachments.execute(query, [msg_id])
+                    for att in attachments:
+                        file_path = att[0]
+                        filename = file_path.split('/')[-1]
+                        if file_path.startswith('~'):
+                            file_path = file_path.lstrip('~/')
+                            print(file_path)
+                            self.__enc_backup.extract_file(relative_path=file_path,
+                                                           output_filename=attachments_path
+                                                           + '/' + filename)
+                if 'progress_callback' in kwargs.keys():
+                    processed_messages += 1
+                    progress = processed_messages * 100 // msg_count
+                    if prev_progress != progress:
+                        prev_progress = progress
+                        kwargs['progress_callback'].emit(
+                            ('sms_imessage', progress))
+
+            sms_db_conn.close()
+            os.remove(sms_db_path)
+
+    def extract_voicemail(self, **kwargs):
+        path = self.__output_dir + '/Voicemail'
+        if self.__backup.is_encrypted():
+            # Connect to manifest.db
+            try:
+                conn = sqlite3.connect(self.__decrypted_manifest_db)
+            except Exception as e:
+                raise Exception(f"Unable to connect to database: {e}")
+
+            # Find voicemail database
+            c = conn.cursor()
+            query = '''SELECT relativePath FROM Files 
+                    WHERE Files.relativePath 
+                    LIKE '%voicemail.db'
+                    LIMIT 1'''
+            c.execute(query)
+
+            # Temporarily save voicemail metadata db
+            voicemail_db_path = path + '/Voicemail'
+            self.__enc_backup.extract_file(relative_path=c.fetchone()[0],
+                                           output_filename=voicemail_db_path)
+
+            # Get voicemail metadata
+            try:
+                voicemail_db_conn = sqlite3.connect(voicemail_db_path)
+            except Exception as e:
+                raise Exception(
+                    f"Unable to connect to voicemail metadata database: {e}")
+            voicemail_db_cursor = voicemail_db_conn.cursor()
+            query = '''SELECT voicemail.ROWID as id,
+                    voicemail.sender,
+                    voicemail.duration,
+                    datetime(voicemail.date+978307200, 'unixepoch', 'localtime') as 'date'
+					FROM voicemail
+					ORDER BY voicemail.date'''
+            voicemail_db_cursor.execute(query)
+
+            # Get voicemail file list
+            file_cursor = conn.cursor()
+            query = '''SELECT relativePath, flags FROM Files 
+                        WHERE Files.relativePath LIKE \'%Voicemail/%.amr\''''
+            file_cursor.execute(query)
+
+            # Get voicemail file count
+            if 'progress_callback' in kwargs.keys():
                 count = conn.cursor()
                 count_query = '''SELECT count(*) FROM Files 
                                 WHERE Files.relativePath 
-                                LIKE \'%Recordings/%.m4a\''''
+                                LIKE \'%Voicemail/%.amr\''''
                 count.execute(count_query)
                 file_count = count.fetchone()[0]
                 processed_files = 0
                 prev_progress = 0
 
-            for file_data in c:
+            # Save to path
+            for file_data, metadata in zip(file_cursor, voicemail_db_cursor):
                 relativePath = file_data[0]
                 file_type = file_data[1]
+
+                # Extract voicemail file
                 try:
                     if file_type == 1:
                         new_path = relativePath.rsplit('/', 1)[-1]
@@ -467,6 +612,17 @@ class DeBackupHandler:
                     raise Exception(
                         f"Unable to extract file {relativePath}: {e}")
 
+                # Generate metadata string
+                sender, duration, date = metadata
+                metadata_string = f'Sender: {sender}\n'
+                metadata_string += f'Date: {date}\n'
+                metadata_string += f'Duration: {duration}\n\n'
+
+                # Save metadata string to file
+                with open(path + '/Voicemail Metadata.txt', 'w') as f:
+                    f.write(metadata_string)
+                    f.close
+
                 # If progress callback provided, emit progress
                 if 'progress_callback' in kwargs.keys():
                     processed_files += 1
@@ -474,8 +630,9 @@ class DeBackupHandler:
                     if prev_progress != progress:
                         prev_progress = progress
                         kwargs['progress_callback'].emit(
-                            ('voice_memos', progress))
+                            ('voicemail', progress))
+            voicemail_db_conn.close()
+            os.remove(voicemail_db_path)
         else:
             # TODO: non-encrypted backups
             pass
-

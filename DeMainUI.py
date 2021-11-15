@@ -342,9 +342,9 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             if settings['notes']:
                 start_thread(self.__handler.extract_notes)
             if settings['sms']:
-                self.__handler.extract_sms_imessage()
+                start_thread(self.__handler.extract_sms_imessage)
             if settings['voicemail']:
-                self.__handler.extract_voicemail()
+                start_thread(self.__handler.extract_voicemail)
             if settings['call_history']:
                 start_thread(self.__handler.extract_call_history)
         except Exception as e:
