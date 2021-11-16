@@ -288,21 +288,18 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 else:
                     break
             self.easter_egg(passcode)
-
-        # Get output directory
-        output_dir = self.get_dir_path("Select output directory")
-        if not output_dir:
-            self.show_info('Extraction canceled')
-            return
-
+        
         # Disable UI
         self.set_ui_enabled(False)
 
         # Extract data
         self.progress_bar.show()
         settings = self.get_checkboxes_states()
-        self.__handler = DeBackupHandler(backup, output_dir)
+        self.__handler = DeBackupHandler(backup)
+
+        # Decrypt, if backup is encrypted
         if backup.is_encrypted():
+            self.status_bar.showMessage('Decrypting...')
             decryption_result = None
 
             def get_decryption_result(result: bool):
@@ -324,6 +321,14 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                     "Unable to decrypt backup: incorrect password?")
                 self.finish_extraction(force=True)
                 return
+
+        # Get output directory
+        output_dir = self.get_dir_path("Select output directory")
+        if not output_dir:
+            self.show_info('Extraction canceled')
+            return
+        self.__handler.set_output_directory(output_dir)
+
         self.__thread_count = sum([item[1] * 1 for item in settings.items()])
 
         def start_thread(func):
@@ -336,7 +341,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             except Exception as e:
                 self.show_error(
                     "Critical error while starting thread", details=e)
-
+        
+        self.status_bar.showMessage('Extracting...')
         try:
             if settings['camera_roll']:
                 start_thread(self.__handler.extract_camera_roll)

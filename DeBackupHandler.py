@@ -6,9 +6,11 @@ from decryptor.iphone_backup import EncryptedBackup
 
 class DeBackupHandler:
 
-    def __init__(self, backup: DeBackup, output_dir: str):
+    def __init__(self, backup: DeBackup):
         self.__backup = backup
-        self.__output_dir = output_dir + '/Backup_' + self.__backup.backup_id()
+
+    def set_output_directory(self, path: str):
+        self.__output_dir = path + '/Backup_' + self.__backup.backup_id()
 
     def decrypt(self, passcode, **kwargs) -> bool:
         ''' Decrypt backup with provided passcode '''
@@ -458,12 +460,12 @@ class DeBackupHandler:
 
             # Get chat list
             chat_list = sms_db_conn.cursor()
-            query = '''SELECT DISTINCT chat.ROWID, 
+            query = '''SELECT  chat.ROWID, 
                     handle.id,
                     handle.uncanonicalized_id,
                     handle.service
                     FROM chat
-                    INNER JOIN handle ON handle.ROWID = chat.ROWID'''
+                    LEFT JOIN handle ON handle.ROWID = chat.ROWID'''
             chat_list.execute(query)
 
             if 'progress_callback' in kwargs.keys():
@@ -479,6 +481,7 @@ class DeBackupHandler:
                 # Extract chat info
                 chat_id, handle_id, handle_raw_id, service = chat
                 # Get messages in chat
+                print('ID:', chat_id)
                 messages = sms_db_conn.cursor()
                 query = '''SELECT chat_message_join.message_id,
                         message.text,
@@ -504,7 +507,6 @@ class DeBackupHandler:
                 for msg in messages:
                     # Extract message data
                     msg_id, text, is_from_me, date, date_delivered, date_read = msg
-
                     # Generate message string
                     msg_string = f'ID: {msg_id}\n'
                     msg_string = 'From: me\n' if is_from_me else f'From: {handle_id}\n'
