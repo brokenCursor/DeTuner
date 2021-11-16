@@ -481,7 +481,6 @@ class DeBackupHandler:
                 # Extract chat info
                 chat_id, handle_id, handle_raw_id, service = chat
                 # Get messages in chat
-                print('ID:', chat_id)
                 messages = sms_db_conn.cursor()
                 query = '''SELECT chat_message_join.message_id,
                         message.text,

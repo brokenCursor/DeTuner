@@ -2,12 +2,13 @@ import sys
 import os
 from DeWorker import DeWorker
 from ui.DeMainUILayout import DeMainUILayout
+from ui.DeQuitLayout import DeQuitLayout
 from DeBackup import DeBackup, InvalidBackupException
 from DeBackupHandler import DeBackupHandler
 from DeSettingsManager import DeSettingsManager
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar
+from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar, QMainWindow
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import QThreadPool
+from PyQt5.QtCore import QThreadPool, Qt
 from easter_egg import *
 
 
@@ -22,14 +23,20 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.progress_bar = QProgressBar()
         self.status_bar.addPermanentWidget(self.progress_bar)
         self.progress_bar.hide()
+
+        # Bind actions and buttons
         self.bind_buttons()
         self.bind_actions()
 
+        self.backup_table.setContextMenuPolicy(Qt.ActionsContextMenu)
+        self.backup_table.addActions(
+            [self.action_add_backup, self.action_delete_backup])
         # Define important variables
         self.__backups = []
         self.__progress = {}
-
+        self.__settings_manager = DeSettingsManager()
         self.import_default_backups()
+        self.import_known_external_backups()
 
         if not self.__backups:
             self.show_warning("No backups found!")
@@ -44,13 +51,26 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def bind_actions(self):
         self.action_add_backup.triggered.connect(self.add_external_backup)
         self.action_export.triggered.connect(self.start_extraction)
-        self.action_exit.triggered.connect(sys.exit)
+        self.action_exit.triggered.connect(self.quit)
+        self.action_delete_backup.triggered.connect(
+            self.delete_selected_backup)
 
     def import_default_backups(self):
         backup_paths = self.get_backup_list()
         if backup_paths:
             for path in backup_paths:
                 self.import_backup(path)
+        self.update_table()
+
+    def import_known_external_backups(self):
+        backup_paths = \
+            self.__settings_manager.get_external_backups_paths()
+        if backup_paths:
+            for path in backup_paths:
+                try:
+                    self.import_backup(path)
+                except:
+                    continue
         self.update_table()
 
     def update_selected_backup_info(self):
@@ -82,6 +102,18 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         # Enable UI elements
         self.start_button.setEnabled(True)
         self.set_checkboxes_enabled(True)
+
+    def delete_selected_backup(self):
+        backup = self.get_selected_backup()
+        if not backup:
+            self.show_warning('Unable to delete backup: no backup selected!')
+        backup_path = backup.get_path()
+        if r'\AppData\Roaming\Apple Computer\MobileSync\Backup' not in backup_path:
+            self.__settings_manager.delete_external_backup(backup_path)
+            self.__backups.remove(backup)
+            self.backup_table.takeItem(self.backup_table.currentRow())
+        else:
+            self.show_warning('Unable to delete backup from default directory')
 
     def set_checkboxes_enabled(self, enable: bool = True):
         ''' Enable/disable checkboxes '''
@@ -159,15 +191,15 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             except Exception as e:
                 self.show_error("Unable to import external backup", details=e)
             else:
+                self.__settings_manager.add_external_backup(path)
                 self.update_table()
         else:
             self.show_warning("No backup selected!")
 
-    def get_dir_path(self, title) -> str | None:
+    def get_dir_path(self, title, start: str = '.') -> str | None:
         ''' Return path to a directory '''
-        
         path = QFileDialog.getExistingDirectory(
-            self, title)
+            self, title, start)
         return path if path else None
 
     def show_message(self, message: str = "An unknown error ocurred!",
@@ -289,7 +321,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 else:
                     break
             self.easter_egg(passcode)
-        
+
         # Disable UI
         self.set_ui_enabled(False)
 
@@ -324,12 +356,17 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 return
 
         # Get output directory
-        output_dir = self.get_dir_path("Select output directory")
+        last_output_dir = self.__settings_manager.get_last_export_path()
+        output_dir = self.get_dir_path(
+            "Select output directory", last_output_dir)
         if not output_dir:
             self.show_info('Extraction canceled')
+            self.set_ui_enabled(True)
             return
+        self.__settings_manager.update_last_export_path(output_dir)
         self.__handler.set_output_directory(output_dir)
 
+        # Calc thread count
         self.__thread_count = sum([item[1] * 1 for item in settings.items()])
 
         def start_thread(func):
@@ -342,7 +379,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             except Exception as e:
                 self.show_error(
                     "Critical error while starting thread", details=e)
-        
+
         self.status_bar.showMessage('Extracting...')
         try:
             if settings['camera_roll']:
@@ -364,6 +401,21 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         except Exception as e:
             self.show_error(
                 "Critical error while starting extraction", details=e)
+
+    def quit(self):
+        self.set_ui_enabled(False)
+        self.q = QMainWindow()
+        self.ui = DeQuitLayout()
+        self.ui.setupUi(self.q)
+
+        def cancel():
+            self.set_ui_enabled(True)
+            self.q.close()
+        
+        self.ui.cancel_button.clicked.connect(cancel)
+        self.ui.quit_button.clicked.connect(sys.exit)
+        self.q.show()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

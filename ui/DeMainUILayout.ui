@@ -536,6 +536,7 @@
      <string>File</string>
     </property>
     <addaction name="action_add_backup"/>
+    <addaction name="action_delete_backup"/>
     <addaction name="action_export"/>
     <addaction name="separator"/>
     <addaction name="action_exit"/>
@@ -579,6 +580,14 @@
    </property>
    <property name="statusTip">
     <string>Quit DeTuner</string>
+   </property>
+  </action>
+  <action name="action_delete_backup">
+   <property name="text">
+    <string>Delete backup</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Del</string>
    </property>
   </action>
  </widget>
