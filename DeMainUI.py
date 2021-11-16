@@ -4,6 +4,7 @@ from DeWorker import DeWorker
 from ui.DeMainUILayout import DeMainUILayout
 from DeBackup import DeBackup, InvalidBackupException
 from DeBackupHandler import DeBackupHandler
+from DeSettingsManager import DeSettingsManager
 from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QThreadPool

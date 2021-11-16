@@ -47,39 +47,65 @@ class DeSettingsManager:
             query = '''CREATE TABLE external_backups (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     backup_id text NOT NULL,
-                    path text NOT NULL
+                      path text NOT NULL
                     );'''
             conn.execute(query)
 
             query = '''CREATE TABLE settings (
-                    name TEXT PRIMARY KEY,
+                    name TEXT UNIQUE PRIMARY KEY,
                     value TEXT
                     )'''
             conn.execute(query)
 
-            query = '''INSERT INTO settings.settings (name, value)
-                    VALUES ('last_export_path', '.')'''
+            query = '''INSERT INTO settings (name, value)
+                    VALUES ('last_export_path', '.');'''
             conn.execute(query)
+            conn.commit()
 
             conn.close()
 
     def get_setting_value(self, name) -> str | bool:
         ''' Return setting value for provied name '''
-        
+
         try:
             conn = sqlite3.connect(self.db_path)
-        except:
-            print('Unable to connect to db')
+        except Exception as e:
+            raise Exception(f'Unable to connect to db: {e}')
         else:
             # Check if setting name is valid
             c = conn.cursor()
             query = '''SELECT count(name) FROM settings WHERE name = ?'''
-            if c.execute(query, [name]).fetchone()[0] != 1:
+            result = c.execute(query, [name]).fetchone()[0]
+            if result != 1:
                 return False
-            
             # Get value
             c = conn.cursor()
             query = '''SELECT value FROM settings WHERE name = ?'''
-            value = c.execute(query).fetchone()[0]
+            value = c.execute(query, [name]).fetchone()[0]
+            return value
 
+    def get_last_export_path(self) -> str:
+        ''' Get last path used for export '''
+        return self.get_setting_value('last_export_path')
 
+    def update_setting(self, name: str, value: str):
+        try:
+            conn = sqlite3.connect(self.db_path)
+        except Exception as e:
+            raise Exception(f'Unable to connect to db: {e}')
+        else:
+            # Check if setting name is valid
+            c = conn.cursor()
+            query = '''SELECT count(name) FROM settings WHERE name = ?'''
+            result = c.execute(query, [name]).fetchone()[0]
+            if result != 1:
+                return False
+            query = ''' UPDATE settings 
+                    SET value = ?
+                    WHERE name = ?'''
+            conn.execute(query, [value, name])
+            conn.commit()
+
+    def update_last_export_path(self, last_export_path: str):
+        ''' Update last path used for export '''
+        self.update_setting('last_export_path', last_export_path)
