@@ -164,7 +164,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
     def get_dir_path(self, title) -> str | None:
         ''' Return path to a directory '''
-
+        
         path = QFileDialog.getExistingDirectory(
             self, title)
         return path if path else None
