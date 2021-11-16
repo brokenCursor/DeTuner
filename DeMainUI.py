@@ -43,12 +43,16 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.__threadpool = QThreadPool().globalInstance()
 
     def bind_buttons(self):
+        """ Attach button's "clicked" signal to it's function """
+
         self.add_backup_button.clicked.connect(self.add_external_backup)
         self.backup_table.itemSelectionChanged.connect(
             self.update_selected_backup_info)
         self.start_button.clicked.connect(self.start_extraction)
 
     def bind_actions(self):
+        """ Attach action's "triggered" signal to it's function"""
+
         self.action_add_backup.triggered.connect(self.add_external_backup)
         self.action_export.triggered.connect(self.start_extraction)
         self.action_exit.triggered.connect(self.quit)
@@ -56,6 +60,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.delete_selected_backup)
 
     def import_default_backups(self):
+        """ Import backups from default iTunes backup path"""
+
         backup_paths = self.get_backup_list()
         if backup_paths:
             for path in backup_paths:
@@ -63,6 +69,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.update_table()
 
     def import_known_external_backups(self):
+        """ Import external backups from database"""
+
         backup_paths = \
             self.__settings_manager.get_external_backups_paths()
         if backup_paths:
@@ -74,8 +82,13 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.update_table()
 
     def update_selected_backup_info(self):
+        """ Update UI elements in accordance to selected backup"""
+
         # Get backup from list by index
         backup = self.get_selected_backup()
+        if not backup:
+            self.reset_backup_info()
+            return
 
         # Fill in device info
         self.device_name_label.setText('**' + backup.device_name() + '**')
@@ -103,9 +116,32 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.start_button.setEnabled(True)
         self.set_checkboxes_enabled(True)
 
+    def reset_backup_info(self):
+        """ Reset backup UI elements to their default states """
+
+        # Reset device info
+        self.device_name_label.setText('**Device Name**')
+        self.model_label.setText("Model:")
+        self.ios_version_label.setText("iOS Version:")
+        self.serial_number_label.setText("Serial Number:")
+        self.imei_label.setText("IMEI:")
+        self.device_image.setText("SELECT BACKUP")
+
+        # Reset in backup info
+        self.backup_date_label.setText("Date:")
+        self.backup_itunes_ver_label.setText("iTunes version:")
+        self.backup_is_encrypted_label.setText("Encrypted:")
+        self.backup_passcode_set_label.setText("Passcode set:")
+
+        # Disable UI elements
+        self.set_checkboxes_enabled(False)
+        self.start_button.setEnabled(False)
+
     def delete_selected_backup(self):
+        """ Delete selected backup if selected backup is external"""
+
         backup = self.get_selected_backup()
-        if not backup:
+        if not backup:  # If no backup selected
             self.show_warning('Unable to delete backup: no backup selected!')
         backup_path = backup.get_path()
         if r'\AppData\Roaming\Apple Computer\MobileSync\Backup' not in backup_path:
@@ -116,7 +152,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.show_warning('Unable to delete backup from default directory')
 
     def set_checkboxes_enabled(self, enable: bool = True):
-        ''' Enable/disable checkboxes '''
+        """ Enable/disable checkboxes """
 
         self.sms_checkbox.setEnabled(enable)
         self.notes_checkbox.setEnabled(enable)
@@ -128,6 +164,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.call_history_checkbox.setEnabled(enable)
 
     def set_ui_enabled(self, enabled: True):
+        """ Enable/disable all UI elements"""
+
         self.set_checkboxes_enabled(enabled)
         self.start_button.setEnabled(enabled)
         self.add_backup_button.setEnabled(enabled)
@@ -135,6 +173,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.menubar.setEnabled(enabled)
 
     def get_checkboxes_states(self) -> dict:
+        """ Get settings for export """
+
         states = {
             'call_history': self.call_history_checkbox.isChecked(),
             'calendar': self.calendar_checkbox.isChecked(),
@@ -148,6 +188,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         return states
 
     def get_backup_list(self) -> list | None:
+        """ Get list of backups in default iTunes backup directory """
+
         path = os.path.expanduser(
             '~') + r'\AppData\Roaming\Apple Computer\MobileSync\Backup'
         if os.path.exists(path):
@@ -173,6 +215,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 'An unknown error ocurred during backup import', details=str(e))
 
     def update_table(self):
+        """ Clear and fill in table with list of backups """
+
         self.backup_table.clear()
         for b in self.__backups:
             item_text = b.display_name() + '\n' + b.last_backup_date()
@@ -198,6 +242,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
     def get_dir_path(self, title, start: str = '.') -> str | None:
         ''' Return path to a directory '''
+
         path = QFileDialog.getExistingDirectory(
             self, title, start)
         return path if path else None
@@ -222,12 +267,13 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             details (str): a detailed description for message
             Default: None'''
 
+        # Create result hook
         func_result = None
 
         def result_hook(i):
             global func_result
             func_result = i.text()
-
+        # Setup QMessageBox
         msg = QMessageBox()
         msg.setIcon(icon)
         msg.setWindowIcon(QIcon('./assets/icon24'))
@@ -240,6 +286,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         else:
             msg.setStandardButtons(QMessageBox.Ok)
         msg.buttonClicked.connect(result_hook)
+
+        # Show QMessageBox
         _ = msg.exec_()  # idk why, but that's how it works
 
         return func_result  # TODO: fix returning of clicked button
@@ -269,6 +317,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         return self.__backups[index] if index != -1 else None
 
     def get_passcode(self) -> tuple:
+        """ Show a QInputDialog for user to enter encryption passcode """
+
         dialog = QInputDialog()
         dialog.setTextEchoMode(QLineEdit.EchoMode.Password)
         passcode, result = dialog.getText(
@@ -284,12 +334,13 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         pass
 
     def get_worker_progress(self, data):
+        """ Get progress from worker, update progress bar """
         name, progress = data[0], data[1]
         if name in self.__progress.keys():
             self.__progress[name] += progress - self.__progress[name]
         else:
             self.__progress[name] = progress
-        self.progress_bar.setValue(
+        self.progress_bar.setValue( # Sum all elements 
             sum([item[1] for item in self.__progress.items()]) // self.__thread_count)
 
     def finish_extraction(self, force: bool = False):
@@ -411,7 +462,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         def cancel():
             self.set_ui_enabled(True)
             self.q.close()
-        
+
         self.ui.cancel_button.clicked.connect(cancel)
         self.ui.quit_button.clicked.connect(sys.exit)
         self.q.show()

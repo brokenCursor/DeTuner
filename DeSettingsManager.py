@@ -1,8 +1,6 @@
 import sqlite3
 import os
 
-from PyQt5.sip import delete
-
 
 class DeSettingsManager:
 
