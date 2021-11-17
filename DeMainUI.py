@@ -138,7 +138,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.start_button.setEnabled(False)
 
     def delete_selected_backup(self):
-        """ Delete selected backup if selected backup is external"""
+        """ Delete selected backup if selected backup is external """
 
         backup = self.get_selected_backup()
         if not backup:  # If no backup selected
