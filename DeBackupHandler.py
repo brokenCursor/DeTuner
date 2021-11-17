@@ -5,15 +5,22 @@ from decryptor.iphone_backup import EncryptedBackup
 
 
 class DeBackupHandler:
+    ''' Class for performing decryption of a backup and extracting of data from it '''
 
     def __init__(self, backup: DeBackup):
+        ''' Setup DeBackupHandler
+            args:
+                backup (DeBackup): a backup to be used for all operations '''
         self.__backup = backup
 
     def set_output_directory(self, path: str):
+        ''' Set directory for writing results to '''
+
         self.__output_dir = path + '/Backup_' + self.__backup.backup_id()
 
-    def decrypt(self, passcode, **kwargs) -> bool:
+    def decrypt(self, passcode, **_) -> bool:
         ''' Decrypt backup with provided passcode '''
+
         try:
             self.__enc_backup = EncryptedBackup(
                 backup_directory=self.__backup.get_path(), passphrase=passcode)
@@ -21,12 +28,14 @@ class DeBackupHandler:
         except Exception as e:
             return False
 
+        # Save backup's Manifest.db path
         self.__decrypted_manifest_db = \
             self.__enc_backup._temp_decrypted_manifest_db_path
-
         return True
 
     def extract_camera_roll(self, **kwargs):
+        ''' Extract all images and videos found in device's Camera Roll '''
+        
         # Set output path
         path = self.__output_dir + '/Camera Roll'
         if self.__backup.is_encrypted():
@@ -60,7 +69,8 @@ class DeBackupHandler:
             relativePath = file_data[0]
             file_type = file_data[1]
             try:
-                if file_type == 1:
+                if file_type == 1: # If file is file and not something else
+                    # Get file from backup and store at path
                     self.__enc_backup.extract_file(
                         relative_path=relativePath,
                         output_filename=path + '/' + relativePath)
@@ -71,7 +81,7 @@ class DeBackupHandler:
             if 'progress_callback' in kwargs.keys():
                 processed_files += 1
                 progress = processed_files * 100 // file_count
-                if prev_progress != progress:
+                if prev_progress != progress: # Used to limit amount of calls to main thread
                     prev_progress = progress
                     kwargs['progress_callback'].emit(('camera_roll', progress))
         else:
@@ -79,18 +89,25 @@ class DeBackupHandler:
             pass
 
     def extract_voice_memos(self, **kwargs):
+        ''' Extract all recordings form Voice Memos app '''
+        
+        # Set output path
         path = self.__output_dir + '/Voice Memos'
         if self.__backup.is_encrypted():
+            # Connect to Manifest.db
             try:
                 conn = sqlite3.connect(self.__decrypted_manifest_db)
             except Exception as e:
                 raise Exception(f"Unable to connect to database: {e}")
+            
+            # Get files
             c = conn.cursor()
             query = '''SELECT relativePath, flags FROM Files 
                     WHERE Files.relativePath 
                     LIKE \'%Recordings/%.m4a\''''
             c.execute(query)
-
+            
+            # If progress callback provided
             if 'progress_callback' in kwargs.keys():
                 # Get file count
                 count = conn.cursor()
@@ -102,15 +119,17 @@ class DeBackupHandler:
                 processed_files = 0
                 prev_progress = 0
 
+            # Extract files
             for file_data in c:
                 relativePath = file_data[0]
                 file_type = file_data[1]
                 try:
-                    if file_type == 1:
-                        new_path = relativePath.rsplit('/', 1)[-1]
+                    if file_type == 1: # If file is file and not something else
+                        file_name = relativePath.rsplit('/', 1)[-1]
+                        # Get file from backup and store at path
                         self.__enc_backup.extract_file(
                             relative_path=relativePath,
-                            output_filename=path + '/' + new_path)
+                            output_filename=path + '/' + file_name)
                 except Exception as e:
                     raise Exception(
                         f"Unable to extract file {relativePath}: {e}")
@@ -119,7 +138,7 @@ class DeBackupHandler:
                 if 'progress_callback' in kwargs.keys():
                     processed_files += 1
                     progress = processed_files * 100 // file_count
-                    if prev_progress != progress:
+                    if prev_progress != progress: # Used to limit amount of calls to main thread
                         prev_progress = progress
                         kwargs['progress_callback'].emit(
                             ('voice_memos', progress))
@@ -128,6 +147,8 @@ class DeBackupHandler:
             pass
 
     def extract_contacts(self, **kwargs):
+        ''' Extract all contacts '''
+        # Set output path
         path = self.__output_dir + '/Contacts'
         if self.__backup.is_encrypted():
             # Find AddressBook database
@@ -146,12 +167,14 @@ class DeBackupHandler:
             self.__enc_backup.extract_file(relative_path=c.fetchone()[0],
                                            output_filename=addr_db_path)
 
-            # Exctract contacts
+            # Connect to AddressBook DB
             try:
                 addr_db_conn = sqlite3.connect(addr_db_path)
             except Exception as e:
                 raise Exception(
                     f"Unable to connect to AddressBook database: {e}")
+            
+            # Get list of contacts
             addr_db = addr_db_conn.cursor()
             query = '''SELECT ABPerson.ROWID as id,
                         ABPerson.DisplayName,
@@ -173,31 +196,35 @@ class DeBackupHandler:
                         ORDER BY ABPerson.First'''
             addr_db.execute(query)
 
-            # Get contacts count
+            # If progress callback provided
             if 'progress_callback' in kwargs.keys():
+                # Get contacts count
                 row_count_cursor = addr_db_conn.cursor()
                 query = '''SELECT count(*) as id FROM ABPerson'''
                 row_count = row_count_cursor.execute(query).fetchone()[0]
                 prev_progress = 0
                 processed_count = 0
-
-            # Write contacts to file
+            
+            # Setup file header
             header = ['ID', 'Dispaly Name', 'First Name', 'Second Name',
                       'Last Name', 'Nickname', 'Organization',
                       'Department', 'Job Title', 'Note', 'Birthday',
                       'Phone Number', 'Email', 'Social Profile', 'URL',
                       'Created']
-
+            
+            # Write contacts to file
             with open(path + '/Contacts.txt', 'w') as f:
                 f.write('\t'.join(header) + '\n')
                 for contact in addr_db:
                     f.write(
                         '\t'.join([str(val).replace('\u202a', '').replace('\u2011', '-').
                                    replace('\u202c', '') for val in contact]) + '\n')
+                    
+                    # If progress callback provided, emit progress
                     if 'progress_callback' in kwargs.keys():
                         processed_count += 1
                         progress = processed_count * 100 // row_count
-                        if prev_progress != progress:
+                        if prev_progress != progress: # Used to limit amount of calls to main thread
                             prev_progress = progress
                             kwargs['progress_callback'].emit(
                                 ('contacts', progress))
@@ -211,6 +238,9 @@ class DeBackupHandler:
             pass
 
     def extract_call_history(self, **kwargs):
+        ''' Extract history of call form Phone app '''
+        
+        # Setup output path
         path = self.__output_dir + '/Call History'
         if self.__backup.is_encrypted():
             # Find CallHistory database
@@ -229,12 +259,14 @@ class DeBackupHandler:
             self.__enc_backup.extract_file(relative_path=c.fetchone()[0],
                                            output_filename=call_db_path)
 
-            # Exctract contacts
+            # Connect to CallHistory DB
             try:
                 call_db_conn = sqlite3.connect(call_db_path)
             except Exception as e:
                 raise Exception(
                     f"Unable to connect to CallHistory database: {e}")
+            
+            # Get call history
             call_db = call_db_conn.cursor()
             query = '''SELECT  ZCALLRECORD.Z_PK,
                     ZCALLRECORD.ZADDRESS,
@@ -244,8 +276,9 @@ class DeBackupHandler:
                     ORDER BY ZCALLRECORD.ZDATE'''
             call_db.execute(query)
 
+            # If progress callback provided
             if 'progress_callback' in kwargs.keys():
-                # Get file count
+                # Get call count
                 count = call_db_conn.cursor()
                 count_query = '''SELECT count(*) FROM ZCALLRECORD'''
                 count.execute(count_query)
@@ -253,21 +286,22 @@ class DeBackupHandler:
                 processed_calls = 0
                 prev_progress = 0
 
-            # Write contacts to file
+            # Write call history to file to file
             header = ['ID', 'Phone Number', 'Date', 'Duration']
             with open(path + '/Call History.txt', 'w') as f:
                 f.write('\t'.join(header) + '\n')
                 for contact in call_db:
+                    f.write(
+                        '\t'.join([str(val) for val in contact]) + '\n')
+                                           
                     # If progress callback provided, emit progress
                     if 'progress_callback' in kwargs.keys():
                         processed_calls += 1
                         progress = processed_calls * 100 // call_count
-                        if prev_progress != progress:
+                        if prev_progress != progress: # Used to limit amount of calls to main thread
                             prev_progress = progress
                             kwargs['progress_callback'].emit(
                                 ('call_history', progress))
-                    f.write(
-                        '\t'.join([str(val) for val in contact]) + '\n')
                 f.close()
 
             # Close and delete temporary database
@@ -278,6 +312,9 @@ class DeBackupHandler:
             pass
 
     def extract_calendar(self, **kwargs):
+        ''' Extract all events form Calendar app '''
+        
+        # Set output path
         path = self.__output_dir + '/Calendar'
         if self.__backup.is_encrypted():
             # Find Calendar database
@@ -291,17 +328,19 @@ class DeBackupHandler:
                     LIMIT 1'''
             c.execute(query)
 
-            # Temporarily save CallHistory database
+            # Temporarily save Calendar database
             calendar_db_path = path + '/Calendar'
             self.__enc_backup.extract_file(relative_path=c.fetchone()[0],
                                            output_filename=calendar_db_path)
 
-            # Exctract contacts
+            # Connect to Calendar DB
             try:
                 calendar_db_conn = sqlite3.connect(calendar_db_path)
             except Exception as e:
                 raise Exception(
                     f"Unable to connect to Calendar database: {e}")
+            
+            # Get list of events
             calendar_db = calendar_db_conn.cursor()
             query = '''SELECT CalendarItem.summary, 
                     datetime(CalendarItem.start_date+978307200, 'unixepoch', 'localtime'),
@@ -311,9 +350,10 @@ class DeBackupHandler:
                     FROM CalendarItem
                     ORDER BY CalendarItem.start_date'''
             calendar_db.execute(query)
-
+            
+            # If progress callback is provided
             if 'progress_callback' in kwargs.keys():
-                # Get file count
+                # Get event count
                 count = calendar_db_conn.cursor()
                 count_query = '''SELECT count(*) FROM CalendarItem'''
                 count.execute(count_query)
@@ -326,6 +366,7 @@ class DeBackupHandler:
                 for event_data in calendar_db:
                     summary, start_date, end_date, \
                         all_day_flag, description = event_data
+                    # Generate event string
                     event = f'Summary: {summary}\n'
                     event += f'Start: {start_date}\n'
                     event += f'End: {end_date}\n' if all_day_flag else 'All day\n'
@@ -336,7 +377,7 @@ class DeBackupHandler:
                     if 'progress_callback' in kwargs.keys():
                         processed_events += 1
                         progress = processed_events * 100 // event_count
-                        if prev_progress != progress:
+                        if prev_progress != progress: # Used to limit amount of calls to main thread
                             prev_progress = progress
                             kwargs['progress_callback'].emit(
                                 ('calendar', progress))
@@ -350,6 +391,9 @@ class DeBackupHandler:
             pass
 
     def extract_notes(self, **kwargs):
+        ''' Extract notes from Notes app '''
+        
+        # Set output path
         path = self.__output_dir + '/Notes'
         if self.__backup.is_encrypted():
             # Find Notes database
@@ -368,12 +412,13 @@ class DeBackupHandler:
             self.__enc_backup.extract_file(relative_path=c.fetchone()[0],
                                            output_filename=notes_db_path)
 
-            # Exctract notes
+            # Connect to Notes DB
             try:
                 notes_db_conn = sqlite3.connect(notes_db_path)
             except Exception as e:
                 raise Exception(
                     f"Unable to connect to notes database: {e}")
+
             notes_db = notes_db_conn.cursor()
             query = '''SELECT ZNOTE.ZBODY, 
 						ZNOTE.ZTITLE,
@@ -421,10 +466,10 @@ class DeBackupHandler:
                         prev_progress = progress
                         kwargs['progress_callback'].emit(
                             ('notes', progress))
-            
+
             if 'progress_callback' in kwargs.keys() and processed_files == 0:
                 kwargs['progress_callback'].emit(
-                            ('notes', 100))
+                    ('notes', 100))
 
             # Close and delete temporary database
             notes_db_conn.close()
@@ -635,10 +680,10 @@ class DeBackupHandler:
                         prev_progress = progress
                         kwargs['progress_callback'].emit(
                             ('voicemail', progress))
-            
+
             if 'progress_callback' in kwargs.keys() and processed_files == 0:
                 kwargs['progress_callback'].emit(
-                            ('voicemail', 100))
+                    ('voicemail', 100))
 
             voicemail_db_conn.close()
             os.remove(voicemail_db_path)
