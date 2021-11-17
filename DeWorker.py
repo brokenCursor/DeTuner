@@ -1,5 +1,7 @@
 from PyQt5.QtCore import QRunnable, QObject, pyqtSignal, pyqtSlot
-import traceback, sys
+import traceback
+import sys
+
 
 class DeWorker(QRunnable):
     '''
@@ -7,11 +9,12 @@ class DeWorker(QRunnable):
 
     Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
 
-    :param callback: The function callback to run on this worker thread. Supplied args and
-                     kwargs will be passed through to the runner.
-    :type callback: function
-    :param args: Arguments to pass to the callback function
-    :param kwargs: Keywords to pass to the callback function
+    callback (function): The function callback to run on this worker thread. Supplied args and
+                        kwargs will be passed through to the runner.
+
+    args (list): Arguments to pass to the callback function
+
+    kwargs (dict):  Keywords to pass to the callback function
 
     '''
 
@@ -29,9 +32,7 @@ class DeWorker(QRunnable):
 
     @pyqtSlot()
     def run(self):
-        '''
-        Initialise the runner function with passed args, kwargs.
-        '''
+        ''' Initialise the runner function with passed args, kwargs. '''
 
         # Retrieve args/kwargs here; and fire processing using them
         try:
@@ -41,28 +42,26 @@ class DeWorker(QRunnable):
             exctype, value = sys.exc_info()[:2]
             self.signals.error.emit((exctype, value, traceback.format_exc()))
         else:
-            self.signals.result.emit(result)  # Return the result of the processing
+            # Return the result of the processing
+            self.signals.result.emit(result)
         finally:
             self.signals.finished.emit()  # Done
+
 
 class DeWorkerSignals(QObject):
     '''
     Defines the signals available from a running worker thread.
 
-    Supported signals are:
+    Signals:
 
-    finished
-        No data
+    finished (): No data
 
-    error
-        tuple (exctype, value, traceback.format_exc() )
+    error (tuple): 
+            data about error: (exctype, value, traceback.format_exc())
 
-    result
-        object data returned from processing, anything
+    result (Any): object data returned from processing
 
-    progress
-        int indicating % progress
-
+    progress (int): progress in %
     '''
     finished = pyqtSignal()
     error = pyqtSignal(tuple)
