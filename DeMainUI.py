@@ -13,6 +13,7 @@ from easter_egg import *
 
 
 class DeMainUI(QMainWindow, DeMainUILayout):
+    ''' The main (temporarely) class of DeTuner app '''
 
     def __init__(self):
         # Setup UI
@@ -27,27 +28,33 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         # Bind actions and buttons
         self.bind_buttons()
         self.bind_actions()
-
+        
+        # Bind backup_table update signal 
+        self.backup_table.itemSelectionChanged.connect(
+            self.update_selected_backup_info)
+        
+        # Setup backup_tables context menu
         self.backup_table.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.backup_table.addActions(
             [self.action_add_backup, self.action_delete_backup])
+        
         # Define important variables
         self.__backups = []
         self.__progress = {}
         self.__settings_manager = DeSettingsManager()
+        self.__threadpool = QThreadPool().globalInstance()
+        
+        # Import all known backups
         self.import_default_backups()
         self.import_known_external_backups()
-
         if not self.__backups:
             self.show_warning("No backups found!")
-        self.__threadpool = QThreadPool().globalInstance()
+
 
     def bind_buttons(self):
         """ Attach button's "clicked" signal to it's function """
 
         self.add_backup_button.clicked.connect(self.add_external_backup)
-        self.backup_table.itemSelectionChanged.connect(
-            self.update_selected_backup_info)
         self.start_button.clicked.connect(self.start_extraction)
 
     def bind_actions(self):
@@ -147,7 +154,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         if r'\AppData\Roaming\Apple Computer\MobileSync\Backup' not in backup_path:
             self.__settings_manager.delete_external_backup(backup_path)
             self.__backups.remove(backup)
-            self.backup_table.takeItem(self.backup_table.currentRow())
+            self.update_table()
         else:
             self.show_warning('Unable to delete backup from default directory')
 
@@ -171,6 +178,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.add_backup_button.setEnabled(enabled)
         self.backup_table.setEnabled(enabled)
         self.menubar.setEnabled(enabled)
+        self.action_add_backup.setEnabled(enabled)
+        self.action_delete_backup.setEnabled(enabled)
 
     def get_checkboxes_states(self) -> dict:
         """ Get settings for export """
@@ -199,7 +208,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             return None
 
     def import_backup(self, path: str):
-        ''' Import backup from path and add to __backups '''
+        ''' Import backup from path backups '''
 
         try:
             if path in [b.get_path() for b in self.__backups]:
@@ -241,7 +250,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.show_warning("No backup selected!")
 
     def get_dir_path(self, title, start: str = '.') -> str | None:
-        ''' Return path to a directory '''
+        ''' Return path to a user-selected directory '''
 
         path = QFileDialog.getExistingDirectory(
             self, title, start)
@@ -252,14 +261,15 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                      title: str = 'Unknown Error', **kwargs) -> str | None:
         ''' Show a QMessageBox with provided parameters
 
-        Parameters:
+        Args:
             message (str): A string to show as message body.
             Default: \'An An unknown error ocurred!\'
 
             icon (QMessageBox.Icon): An icon to display in message box.
             Default: \'Critical\'
 
-            title (str): Window title. Deafult: \'Unknown Error\'
+            title (str): Window title. 
+            Deafult: \'Unknown Error\'
 
             buttons (QMessageBox.StandartButtons): an object with buttons to be shown
             Default: QMessageBox.Ok
@@ -314,7 +324,10 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         ''' Get selected backup '''
 
         index = self.backup_table.currentRow()
-        return self.__backups[index] if index != -1 else None
+        try:
+            return self.__backups[index]
+        except:
+            return None
 
     def get_passcode(self) -> tuple:
         """ Show a QInputDialog for user to enter encryption passcode """
@@ -340,10 +353,14 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.__progress[name] += progress - self.__progress[name]
         else:
             self.__progress[name] = progress
-        self.progress_bar.setValue( # Sum all elements 
+        
+        # Get overall progress value
+        self.progress_bar.setValue(  
             sum([item[1] for item in self.__progress.items()]) // self.__thread_count)
 
     def finish_extraction(self, force: bool = False):
+        """ Worker's "finished" signal callback """
+        # If last worker is done or "force" is set 
         if not self.__threadpool.activeThreadCount() or force:
             del self.__handler
             self.progress_bar.reset()
@@ -352,7 +369,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.set_ui_enabled(True)
 
     def start_extraction(self):
-
+        """ Setup and start extraction of selected backup """
         # Get backup from table
         backup = self.get_selected_backup()
         if not backup:
@@ -361,10 +378,9 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         # Get passcode
         if backup.is_passcode_set():
-            # self.statusbar
             while True:
                 passcode, result = self.get_passcode()
-                if not result:
+                if not result:  # If user canceled/closed window
                     self.show_info('Extraction canceled')
                     return
                 elif passcode == '':
@@ -384,12 +400,15 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         # Decrypt, if backup is encrypted
         if backup.is_encrypted():
             self.status_bar.showMessage('Decrypting...')
+
             decryption_result = None
 
+            # Decryption result callback
             def get_decryption_result(result: bool):
                 nonlocal decryption_result
                 decryption_result = result
 
+            # Create and setup worker
             worker = DeWorker(self.__handler.decrypt, passcode)
             worker.signals.error.connect(self.handle_export_error)
             worker.signals.result.connect(get_decryption_result)
@@ -414,12 +433,16 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.show_info('Extraction canceled')
             self.set_ui_enabled(True)
             return
+
+        # Save directory to settings as last used for extraction
         self.__settings_manager.update_last_export_path(output_dir)
+
         self.__handler.set_output_directory(output_dir)
 
         # Calc thread count
         self.__thread_count = sum([item[1] * 1 for item in settings.items()])
 
+        # Small function for starting threads
         def start_thread(func):
             try:
                 worker = DeWorker(func)
@@ -431,6 +454,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 self.show_error(
                     "Critical error while starting thread", details=e)
 
+        # Start extraction threads
         self.status_bar.showMessage('Extracting...')
         try:
             if settings['camera_roll']:
@@ -454,15 +478,21 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 "Critical error while starting extraction", details=e)
 
     def quit(self):
+        """ Show "Quit?" dialog """
+
+        # _The_ Ugliest Dialog Possible
+        # Made specially for YL
         self.set_ui_enabled(False)
         self.q = QMainWindow()
         self.ui = DeQuitLayout()
         self.ui.setupUi(self.q)
 
+        # Cancel button callback
         def cancel():
             self.set_ui_enabled(True)
             self.q.close()
 
+        # Setup buttons
         self.ui.cancel_button.clicked.connect(cancel)
         self.ui.quit_button.clicked.connect(sys.exit)
         self.q.show()
