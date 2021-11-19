@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PyQt5.QtCore import QRunnable, QObject, pyqtSignal, pyqtSlot
 import traceback
 import sys

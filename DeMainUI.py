@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
 from DeWorker import DeWorker
@@ -28,28 +29,27 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         # Bind actions and buttons
         self.bind_buttons()
         self.bind_actions()
-        
-        # Bind backup_table update signal 
+
+        # Bind backup_table update signal
         self.backup_table.itemSelectionChanged.connect(
             self.update_selected_backup_info)
-        
+
         # Setup backup_tables context menu
         self.backup_table.setContextMenuPolicy(Qt.ActionsContextMenu)
         self.backup_table.addActions(
             [self.action_add_backup, self.action_delete_backup])
-        
+
         # Define important variables
         self.__backups = []
         self.__progress = {}
         self.__settings_manager = DeSettingsManager()
         self.__threadpool = QThreadPool().globalInstance()
-        
+
         # Import all known backups
         self.import_default_backups()
         self.import_known_external_backups()
         if not self.__backups:
             self.show_warning("No backups found!")
-
 
     def bind_buttons(self):
         """ Attach button's "clicked" signal to it's function """
@@ -353,14 +353,14 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.__progress[name] += progress - self.__progress[name]
         else:
             self.__progress[name] = progress
-        
+
         # Get overall progress value
-        self.progress_bar.setValue(  
+        self.progress_bar.setValue(
             sum([item[1] for item in self.__progress.items()]) // self.__thread_count)
 
     def finish_extraction(self, force: bool = False):
         """ Worker's "finished" signal callback """
-        # If last worker is done or "force" is set 
+        # If last worker is done or "force" is set
         if not self.__threadpool.activeThreadCount() or force:
             del self.__handler
             self.progress_bar.reset()
