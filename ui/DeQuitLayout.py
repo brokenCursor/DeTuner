@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -10,10 +8,12 @@ class DeQuitLayout(object):
     def setupUi(self, DeQuitLayout):
         DeQuitLayout.setObjectName("DeQuitLayout")
         DeQuitLayout.resize(171, 97)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(DeQuitLayout.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            DeQuitLayout.sizePolicy().hasHeightForWidth())
         DeQuitLayout.setSizePolicy(sizePolicy)
         DeQuitLayout.setMinimumSize(QtCore.QSize(171, 97))
         DeQuitLayout.setMaximumSize(QtCore.QSize(171, 97))
@@ -45,7 +45,8 @@ class DeQuitLayout(object):
 
     def retranslateUi(self, DeQuitLayout):
         _translate = QtCore.QCoreApplication.translate
-        DeQuitLayout.setWindowTitle(_translate("DeQuitLayout", "Quit DeTuner?"))
+        DeQuitLayout.setWindowTitle(
+            _translate("DeQuitLayout", "Quit DeTuner?"))
         self.label.setText(_translate("DeQuitLayout", "# Quit DeTuner?"))
         self.quit_button.setText(_translate("DeQuitLayout", "Quit"))
-        self.cancel_button.setText(_translate("DeQuitLayout", "Canccel"))
+        self.cancel_button.setText(_translate("DeQuitLayout", "Cancel"))
