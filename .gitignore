@@ -1,4 +1,6 @@
 /.*
 __pycache__
-ios.*
 *test*
+dist
+build
+*.spec
