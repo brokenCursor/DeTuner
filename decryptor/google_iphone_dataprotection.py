@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #####
 # This code is derived from 'iphone-dataprotection':
 # https://code.google.com/p/iphone-dataprotection/
