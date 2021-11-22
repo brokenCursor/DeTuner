@@ -272,4 +272,4 @@ class DeMainUILayout(object):
         self.action_exit.setText(_translate("MainWindow", "Exit"))
         self.action_exit.setStatusTip(_translate("MainWindow", "Quit DeTuner"))
         self.action_delete_backup.setText(_translate("MainWindow", "Delete backup"))
-        self.action_delete_backup.setShortcut(_translate("MainWindow", "Ctrl+Del"))
+        self.action_delete_backup.setShortcut(_translate("MainWindow", "Del"))

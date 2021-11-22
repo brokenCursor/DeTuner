@@ -53,4 +53,4 @@ class DeQuitLayout(object):
         DeQuitLayout.setWindowTitle(_translate("DeQuitLayout", "Quit DeTuner?"))
         self.label.setText(_translate("DeQuitLayout", "# Quit DeTuner?"))
         self.quit_button.setText(_translate("DeQuitLayout", "Quit"))
-        self.cancel_button.setText(_translate("DeQuitLayout", "Canccel"))
+        self.cancel_button.setText(_translate("DeQuitLayout", "Cancel"))

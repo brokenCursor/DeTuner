@@ -587,7 +587,7 @@
     <string>Delete backup</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Del</string>
+    <string>Del</string>
    </property>
   </action>
  </widget>
