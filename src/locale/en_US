@@ -1,0 +1,26 @@
+{
+    "version": "0.0.1",
+    "locale": "en_US",
+    "language": "English",
+    "strings": {
+        "main_ui":{
+            "menubar": {
+                "file_menu": "File"
+            },
+            "actions":{
+                "add_backup": "Add backup",
+                "delete_backup": "Delete backup",
+                "extract": "Extract",
+                "exit": "Exit"
+            },
+            "buttons": {
+                "add_backup": "Add backup",
+                "extract": "Extract!"
+            },
+            "checkboxes": {
+                
+            }
+            
+        }
+    }
+}

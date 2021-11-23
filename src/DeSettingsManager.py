@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sqlite3
 import os
+import locale
 
 
 class DeSettingsManager:
@@ -17,7 +18,7 @@ class DeSettingsManager:
 
     def __import_db(self):
         ''' Import db form self.db_path '''
-        
+
         try:
             self.db_conn = sqlite3.connect(self.db_path)
         except Exception as e:
@@ -63,7 +64,7 @@ class DeSettingsManager:
                     value TEXT
                     )'''
             conn.execute(query)
-            
+
             # Set deafult values for settings
             query = '''INSERT INTO settings (name, value)
                     VALUES ('last_export_path', '.');'''
@@ -100,9 +101,9 @@ class DeSettingsManager:
         c = self.db_conn.cursor()
         query = '''SELECT count(name) FROM settings WHERE name = ?'''
         result = c.execute(query, [name]).fetchone()[0]
-        if result != 1: # If no settings with provided name found
+        if result != 1:  # If no settings with provided name found
             return False
-        
+
         # Update value
         query = ''' UPDATE settings SET value = ? WHERE name = ?'''
         self.db_conn.execute(query, [value, name])
@@ -121,10 +122,10 @@ class DeSettingsManager:
                 VALUES (?)'''
         c.execute(query, [path])
         self.db_conn.commit()
-    
+
     def delete_external_backup(self, path):
         ''' Delete external backup path from DB '''
-        
+
         c = self.db_conn.cursor()
         query = '''DELETE FROM external_backups 
                 WHERE path = ?'''
@@ -138,6 +139,8 @@ class DeSettingsManager:
         query = '''SELECT path FROM external_backups'''
         result = [item[0] for item in c.execute(query).fetchall()]
         return result
+
+
 
     def __del__(self):
         # Make sure we're disconnected form DB
