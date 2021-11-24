@@ -4,10 +4,11 @@ import os
 from DeWorker import DeWorker
 from ui.DeMainUILayout import DeMainUILayout
 from ui.DeQuitLayout import DeQuitLayout
+from ui.DeQuitDialogLayout import DeQuitDialogLayout
 from DeBackup import DeBackup, InvalidBackupException
 from DeBackupHandler import DeBackupHandler
 from DeSettingsManager import DeSettingsManager
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar, QMainWindow
+from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar, QMainWindow
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QThreadPool, Qt
 from easter_egg import *
@@ -479,23 +480,12 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
     def quit(self):
         """ Show "Quit?" dialog """
-
-        # _The_ Ugliest Dialog Possible
-        # Made specially for YL
-        self.set_ui_enabled(False)
-        self.q = QMainWindow()
-        self.ui = DeQuitLayout()
-        self.ui.setupUi(self.q)
-
-        # Cancel button callback
-        def cancel():
-            self.set_ui_enabled(True)
-            self.q.close()
-
-        # Setup buttons
-        self.ui.cancel_button.clicked.connect(cancel)
-        self.ui.quit_button.clicked.connect(sys.exit)
-        self.q.show()
+        self.quit_dialog = DeQuitDialogLayout(self)
+        self.quit_dialog.setupUi(self.quit_dialog)
+        if self.quit_dialog.exec():
+            sys.exit(0)
+        else:
+            pass
 
 
 if __name__ == '__main__':
