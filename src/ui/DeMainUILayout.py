@@ -5,27 +5,36 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class DeMainUILayout(object):
+    def set_locale(self, locale):
+        self.strings = locale
+
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(680, 483)
+
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
             MainWindow.sizePolicy().hasHeightForWidth())
+
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMinimumSize(QtCore.QSize(680, 483))
         MainWindow.setMaximumSize(QtCore.QSize(680, 483))
+
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("./assets/icon24.png"),
                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
+
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
         self.add_backup_button = QtWidgets.QPushButton(self.centralwidget)
         self.add_backup_button.setGeometry(QtCore.QRect(10, 390, 260, 41))
         self.add_backup_button.setObjectName("add_backup_button")
+
         self.backup_table = QtWidgets.QListWidget(self.centralwidget)
         self.backup_table.setGeometry(QtCore.QRect(10, 10, 260, 371))
         self.backup_table.setHorizontalScrollBarPolicy(
@@ -37,21 +46,26 @@ class DeMainUILayout(object):
         self.backup_table.setDefaultDropAction(QtCore.Qt.IgnoreAction)
         self.backup_table.setIconSize(QtCore.QSize(56, 56))
         self.backup_table.setObjectName("backup_table")
+
         self.device_image = QtWidgets.QLabel(self.centralwidget)
         self.device_image.setGeometry(QtCore.QRect(290, 10, 80, 130))
         self.device_image.setAlignment(QtCore.Qt.AlignCenter)
         self.device_image.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
         self.device_image.setObjectName("device_image")
+
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(390, 10, 261, 131))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
+
         self.device_info_layout = QtWidgets.QVBoxLayout(
             self.verticalLayoutWidget)
         self.device_info_layout.setContentsMargins(0, 0, 0, 0)
         self.device_info_layout.setObjectName("device_info_layout")
+
         self.device_name_label = QtWidgets.QLabel(self.verticalLayoutWidget)
         font = QtGui.QFont()
         font.setPointSize(14)
+
         self.device_name_label.setFont(font)
         self.device_name_label.setTextFormat(QtCore.Qt.MarkdownText)
         self.device_name_label.setTextInteractionFlags(
@@ -238,88 +252,136 @@ class DeMainUILayout(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "DeTuner"))
-        self.add_backup_button.setStatusTip(_translate(
-            "MainWindow", "Import backup from non-iTunes directory"))
-        self.add_backup_button.setText(_translate("MainWindow", "Add backup"))
+        self.add_backup_button.setStatusTip(_translate("MainWindow",
+                                                       self.strings["status_tips"]["add_backup_button"]))
+        self.add_backup_button.setText(_translate(
+            "MainWindow", self.strings["buttons"]["add_backup"]))
         self.backup_table.setStatusTip(_translate(
-            "MainWindow", "Table of imported backups"))
-        self.device_image.setStatusTip(_translate("MainWindow", "Device icon"))
-        self.device_image.setText(_translate("MainWindow", "SELECT BACKUP"))
+            "MainWindow", self.strings["status_tips"]["backup_table"]))
+
+        self.device_image.setStatusTip(
+            _translate("MainWindow", self.strings["status_tips"]["device_image"]))
+        self.device_image.setText(_translate(
+            "MainWindow", self.strings["device_info"]["device_image"]))
+
         self.device_name_label.setStatusTip(_translate(
-            "MainWindow", "User-specified device name"))
+            "MainWindow", self.strings["status_tips"]["device_name_label"]))
         self.device_name_label.setText(
-            _translate("MainWindow", "**Device Name**"))
-        self.model_label.setStatusTip(_translate("MainWindow", "Model name"))
-        self.model_label.setText(_translate("MainWindow", "Model:"))
+            _translate("MainWindow", self.strings["device_info"]["device_name_label"]))
+
+        self.model_label.setStatusTip(_translate(
+            "MainWindow", self.strings["status_tips"]["model_label"]))
+        self.model_label.setText(_translate(
+            "MainWindow", self.strings["device_info"]["model"]))
+
         self.ios_version_label.setStatusTip(
-            _translate("MainWindow", "iOS version"))
+            _translate("MainWindow", self.strings["status_tips"]["ios_version_label"]))
         self.ios_version_label.setText(
-            _translate("MainWindow", "iOS Version:"))
+            _translate("MainWindow", self.strings["device_info"]["ios_version"]))
+
         self.serial_number_label.setStatusTip(
-            _translate("MainWindow", "Serial Nubmer"))
+            _translate("MainWindow", self.strings["status_tips"]["serial_number_label"]))
         self.serial_number_label.setText(
-            _translate("MainWindow", "Serial Number:"))
-        self.imei_label.setStatusTip(_translate("MainWindow", "IMEI"))
-        self.imei_label.setText(_translate("MainWindow", "IMEI:"))
+            _translate("MainWindow", self.strings["device_info"]["serial_number"]))
+
+        self.imei_label.setStatusTip(_translate(
+            "MainWindow", self.strings["status_tips"]["imei_label"]))
+        self.imei_label.setText(_translate(
+            "MainWindow", self.strings["device_info"]["imei"]))
+
         self.call_history_checkbox.setStatusTip(
-            _translate("MainWindow", "Extract call history?"))
+            _translate("MainWindow", self.strings["status_tips"]["call_history_checkbox"]))
         self.call_history_checkbox.setText(
-            _translate("MainWindow", "Call History"))
+            _translate("MainWindow", self.strings["extraction_settings"]["call_history"]))
+
         self.calendar_checkbox.setStatusTip(
-            _translate("MainWindow", "Extract calendar data?"))
-        self.calendar_checkbox.setText(_translate("MainWindow", "Calendar"))
+            _translate("MainWindow", self.strings["status_tips"]["calendar_checkbox"]))
+        self.calendar_checkbox.setText(_translate(
+            "MainWindow", self.strings["extraction_settings"]["calendar"]))
+
         self.camera_roll_checkbox.setStatusTip(
-            _translate("MainWindow", "Extract Camera Roll?"))
+            _translate("MainWindow", self.strings["status_tips"]["camera_roll_checkbox"]))
         self.camera_roll_checkbox.setText(
-            _translate("MainWindow", "Camera Roll"))
+            _translate("MainWindow", self.strings["extraction_settings"]["camera_roll"]))
+
         self.contacts_checkbox.setStatusTip(
-            _translate("MainWindow", "Extract contacts?"))
-        self.contacts_checkbox.setText(_translate("MainWindow", "Contacts"))
+            _translate("MainWindow", self.strings["status_tips"]["contacts_checkbox"]))
+        self.contacts_checkbox.setText(_translate(
+            "MainWindow", self.strings["extraction_settings"]["contacts"]))
+
         self.notes_checkbox.setStatusTip(
-            _translate("MainWindow", "Extract notes?"))
-        self.notes_checkbox.setText(_translate("MainWindow", "Notes"))
+            _translate("MainWindow", self.strings["status_tips"]["notes_checkbox"]))
+        self.notes_checkbox.setText(_translate(
+            "MainWindow", self.strings["extraction_settings"]["notes"]))
+
         self.sms_checkbox.setStatusTip(_translate(
-            "MainWindow", "Extract SMS & iMessage chat history?"))
-        self.sms_checkbox.setText(_translate("MainWindow", "SMS &&  iMessage"))
+            "MainWindow", self.strings["status_tips"]["sms_checkbox"]))
+        self.sms_checkbox.setText(_translate(
+            "MainWindow", self.strings["extraction_settings"]["sms"]))
+
         self.voice_memos_checkbox.setStatusTip(
-            _translate("MainWindow", "Extract Voice Memos?"))
+            _translate("MainWindow", self.strings["status_tips"]["voice_memos_checkbox"]))
         self.voice_memos_checkbox.setText(
-            _translate("MainWindow", "Voice Memos"))
+            _translate("MainWindow", self.strings["extraction_settings"]["voice_memos"]))
+
         self.voicemail_checkbox.setStatusTip(
-            _translate("MainWindow", "Extract voicemail?"))
+            _translate("MainWindow", self.strings["status_tips"]["voicemail_checkbox"]))
         self.voicemail_checkbox.setText(
-            _translate("MainWindow", "Voicemail Messages"))
-        self.extract_label.setText(_translate("MainWindow", "**Extract**:"))
+            _translate("MainWindow", self.strings["extraction_settings"]["voicemail"]))
+
+        self.extract_label.setText(_translate(
+            "MainWindow", self.strings["extraction_settings"]["extract"]))
+
         self.start_button.setStatusTip(
-            _translate("MainWindow", "Start extraction!"))
-        self.start_button.setText(_translate("MainWindow", "Start!"))
+            _translate("MainWindow", self.strings["status_tips"]["start_button"]))
+        self.start_button.setText(_translate(
+            "MainWindow", self.strings["buttons"]["extract"]))
+
         self.backup_info_label.setText(
-            _translate("MainWindow", "**Backup Info**"))
+            _translate("MainWindow", self.strings["backup_info"]["backup_info"]))
+
         self.backup_date_label.setStatusTip(
-            _translate("MainWindow", "Date of last backup"))
-        self.backup_date_label.setText(_translate("MainWindow", "Date:"))
+            _translate("MainWindow", self.strings["status_tips"]["backup_date_label"]))
+        self.backup_date_label.setText(_translate(
+            "MainWindow", self.strings["backup_info"]["date"]))
+
         self.backup_itunes_ver_label.setStatusTip(
-            _translate("MainWindow", "iTunes version used for backup"))
+            _translate("MainWindow", self.strings["status_tips"]["backup_itunes_ver_label"]))
         self.backup_itunes_ver_label.setText(
-            _translate("MainWindow", "iTunes version:"))
+            _translate("MainWindow", self.strings["backup_info"]["itunes_version"]))
+
         self.backup_is_encrypted_label.setStatusTip(
-            _translate("MainWindow", "Was backup encrypted?"))
+            _translate("MainWindow", self.strings["status_tips"]["backup_is_encrypted_label"]))
         self.backup_is_encrypted_label.setText(
-            _translate("MainWindow", "Encrypted:"))
+            _translate("MainWindow", self.strings["backup_info"]["encrypted"]))
+
         self.backup_passcode_set_label.setStatusTip(
-            _translate("MainWindow", "Was passcode set?"))
+            _translate("MainWindow", self.strings["status_tips"]["backup_passcode_set_label"]))
         self.backup_passcode_set_label.setText(
-            _translate("MainWindow", "Passcode is set:"))
-        self.menuFile.setTitle(_translate("MainWindow", "File"))
-        self.action_add_backup.setText(_translate("MainWindow", "Add backup"))
+            _translate("MainWindow", self.strings["backup_info"]["passcode_set"]))
+
+        self.menuFile.setTitle(_translate(
+            "MainWindow", self.strings["menubar"]["file"]))
+
+        self.action_add_backup.setText(_translate(
+            "MainWindow", self.strings["actions"]["add_backup"]))
         self.action_add_backup.setStatusTip(_translate(
-            "MainWindow", "Import backup from non-iTunes directory"))
+            "MainWindow", self.strings["status_tips"]["action_add_backup"]))
         self.action_add_backup.setShortcut(_translate("MainWindow", "Ctrl+I"))
-        self.action_export.setText(_translate("MainWindow", "Extract"))
+
+        self.action_export.setText(_translate(
+            "MainWindow", self.strings["actions"]["extract"]))
         self.action_export.setStatusTip(
-            _translate("MainWindow", "Start extraction!"))
+            _translate("MainWindow", self.strings["status_tips"]["action_export"]))
         self.action_export.setShortcut(_translate("MainWindow", "Ctrl+E"))
-        self.action_exit.setText(_translate("MainWindow", "Exit"))
-        self.action_exit.setStatusTip(_translate("MainWindow", "Quit DeTuner"))
-        self.action_delete_backup.setText(_translate("MainWindow", "Delete backup"))
+
+        self.action_exit.setText(_translate(
+            "MainWindow", self.strings["actions"]["exit"]))
+        self.action_exit.setStatusTip(_translate(
+            "MainWindow", self.strings["status_tips"]["action_exit"]))
+
+        self.action_delete_backup.setText(
+            _translate("MainWindow", self.strings["actions"]["delete_backup"]))
+        self.action_delete_backup.setStatusTip(_translate(
+            "MainWindow", self.strings["status_tips"]["action_delete_backup"]))
         self.action_delete_backup.setShortcut(_translate("MainWindow", "Del"))

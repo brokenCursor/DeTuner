@@ -1,4 +1,4 @@
-{
+﻿{
     "format": "detuner_locale",
     "version": "0.0.1",
     "locale": "en_US",
@@ -25,9 +25,9 @@
                 "camera_roll": "Camera Roll",
                 "contacts": "Contacts",
                 "notes": "Notes",
-                "sms_imessage": "SMS & iMessage",
+                "sms": "SMS & iMessage",
                 "voice_memos": "Voice Memos",
-                "voicemail_messages": "Voicemail Messages"
+                "voicemail": "Voicemail Messages"
             },
             "device_info": {
                 "device_label": "SELECT BACKUP",
@@ -67,6 +67,7 @@
                 "backup_passcode_set_label": "Was passcode set?",
                 "action_add_backup": "Import backup from non-iTunes directory",
                 "action_export": "Start extraction",
+                "action_delete_backup": "Delete selected backup",
                 "action_exit": "Quit DeTuner"
             }
         },
@@ -78,25 +79,74 @@
         },
         "handler": {
             "backup_directory_prefix": "Backup_",
-            "camera_roll_directory": "Camera Roll",
-            "voice_memos_directory": "Voice Memos",
-            "contacts_directory": "Contacts",
-            "contacts_file_name": "Contacts",
-            "call_history_directory": "Call History",
-            "call_history_file_name": "Call History",
-            "call_history_header": [
-                "ID",
-                "Phone Number",
-                "Date",
-                "Duration"
-            ],
-            "calendar_directory": "Calendar",
-            "calendar_file_name": "Calendar",
-            "calendar_event_template": "",
-            "notes_directory": "Notes",
-            "notes_note_template": "",
-            "sms_imessage_directory": "SMS & iMessage",
-            "sms_imessage_attachments_directory": "Attachments"
+            "camera_roll":{
+                "directory": "Camera Roll"
+            },
+            "voice_memos": {
+                "directory": "Voice Memos"
+            },
+            "contacts":{
+                "directory": "Contacts",
+                "file_name": "Contacts"    
+            },
+            "call_history": {
+                "directory": "Call History",
+                "file_name": "Call History",
+                "header": [
+                    "ID",
+                    "Phone Number",
+                    "Date",
+                    "Duration"
+                ]    
+            },
+            "calendar": {
+                "directory": "Calendar",
+                "file_name": "Calendar",
+                "event_template": ""
+            },
+            "notes": {
+                "directory": "Notes",
+                "note_template": ""
+            },
+            "sms_imessage": {
+                "directory": "SMS & iMessage",
+                "attachments_directory": "Attachments",
+                "chat_history_file_name": "chat_history",
+                "msg_template": ""
+            },
+            "voicemail":{
+                "directory": "Voicemail",
+                "metadata_file_name": "Voicemail Metadata"
+            }
+        },
+        "messages":{
+            "codes":{
+                "warning": "Warning",
+                "error": "Error!",
+                "info": "Info"    
+            },
+            "texts":{
+                "no_backups_found": "No backups found!",
+                "unable_to_delete_no_selected": "Unable to delete backup: no backup selected!",
+                "unable_to_delete_default": "Unable to delete backup from default directory",
+                "no_backup_selected": "No backup selected!",
+                "empty_passcode": "Empty passcode provided!",
+
+                "unable_to_decrypt": "Unable to decrypt backup: incorrect password?",
+                "thread_start_error": "Critical error while starting thread",
+                "unable_to_import": "Unable to import backup {backup_id}: invalid backup",
+                "unknown_import_error": "An unknown error ocurred during backup import",
+                "unable_to_import_external": "Unable to import external backup",
+                "extraction_start_error": "Critical error while starting extraction",
+
+                "extraction_canceled": "Extraction canceled",
+                "backup_already_added": "This backup has already been added",
+                "extraction_completed": "Extraction completed"
+            }
+        },
+        "get_dir_path":{
+            "select_backup_dir": "Select backup directory",
+            "select_output_dir": "Select output directory"
         }
     }
 }

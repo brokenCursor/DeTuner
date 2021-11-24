@@ -66,15 +66,16 @@ class DeSettingsManager:
             conn.execute(query)
 
             # Set deafult values for settings
-            query = '''INSERT INTO settings (name, value)
-                    VALUES ('last_export_path', '.');'''
+            query = '''INSERT INTO settings (name, value) VALUES 
+                    ('last_export_path', '.'),
+                    ('locale', NULL);'''
             conn.execute(query)
             conn.commit()
 
             conn.close()
             del conn
 
-    def get_setting_value(self, name) -> str | bool:
+    def get_setting_value(self, name) -> str | None:
         ''' Return setting value for provied name '''
 
         # Check if setting name is valid
@@ -82,7 +83,7 @@ class DeSettingsManager:
         query = '''SELECT count(name) FROM settings WHERE name = ?'''
         result = c.execute(query, [name]).fetchone()[0]
         if result != 1:
-            return False
+            return None
         # Get values
         c = self.db_conn.cursor()
         query = '''SELECT value FROM settings WHERE name = ?'''
@@ -114,6 +115,16 @@ class DeSettingsManager:
 
         self.update_setting('last_export_path', last_export_path)
 
+    def get_locale(self):
+        """ Get value of "locale" setting"""
+
+        return self.get_setting_value('locale')
+
+    def update_locale(self, locale):
+        """ Update value of locale setting """
+
+        return self.update_setting("locale", locale)
+
     def add_external_backup(self, path):
         ''' Add external backup path to DB '''
 
@@ -139,8 +150,6 @@ class DeSettingsManager:
         query = '''SELECT path FROM external_backups'''
         result = [item[0] for item in c.execute(query).fetchall()]
         return result
-
-
 
     def __del__(self):
         # Make sure we're disconnected form DB

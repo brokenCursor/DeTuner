@@ -5,9 +5,10 @@ from DeWorker import DeWorker
 from ui.DeMainUILayout import DeMainUILayout
 from ui.DeQuitDialogLayout import DeQuitDialogLayout
 from DeBackup import DeBackup, InvalidBackupException
-from DeBackupHandler import DeBackupHandler 
+from DeBackupHandler import DeBackupHandler
 from DeSettingsManager import DeSettingsManager
-from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar, QMainWindow
+from DeLocaleManager import DeLocaleManager
+from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar, QMainWindow
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QThreadPool, Qt
 from easter_egg import *
@@ -17,8 +18,26 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     ''' The main (temporarely) class of DeTuner app '''
 
     def __init__(self):
+        # Load locale data
+        self.__locale_manager = DeLocaleManager()
+
+        # Load settings
+        self.__settings_manager = DeSettingsManager()
+        
+        # Load locale strings
+        system_locale = self.__locale_manager.get_system_locale()
+        if system_locale in [loc[0] for loc in
+                             self.__locale_manager.get_avaliable_locales()]:
+            self.__locale_manager.set_locale(system_locale)
+        else:
+            stored_locale = self.__settings_manager.get_locale()
+            self.__locale_manager.set_locale(stored_locale)
+
+        self.locale_strings = self.__locale_manager.get_strings()
+
         # Setup UI
         super().__init__()
+        self.set_locale(self.locale_strings["main_window"])
         self.setupUi(self)
 
         # Insert progress_bar into status_bar
@@ -42,7 +61,6 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         # Define important variables
         self.__backups = []
         self.__progress = {}
-        self.__settings_manager = DeSettingsManager()
         self.__threadpool = QThreadPool().globalInstance()
 
         # Import all known backups
@@ -218,7 +236,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         except InvalidBackupException as e:
             id = path.split('\\')[-1]
             self.show_error(
-                f"Unable to import backup {id}: invalid backup", details=str(e))
+                "Unable to import backup {backup_id}: \
+                    invalid backup".format(backup_id=id), details=str(e))
         except Exception as e:
             self.show_error(
                 'An unknown error ocurred during backup import', details=str(e))
@@ -261,7 +280,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                      title: str = 'Unknown Error', **kwargs) -> str | None:
         ''' Show a QMessageBox with provided parameters
 
-        Args:
+        args:
             message (str): A string to show as message body.
             Default: \'An An unknown error ocurred!\'
 
