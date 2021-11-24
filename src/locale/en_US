@@ -3,11 +3,11 @@
     "locale": "en_US",
     "language": "English",
     "strings": {
-        "main_ui":{
+        "main_ui": {
             "menubar": {
                 "file_menu": "File"
             },
-            "actions":{
+            "actions": {
                 "add_backup": "Add backup",
                 "delete_backup": "Delete backup",
                 "extract": "Extract",
@@ -18,9 +18,29 @@
                 "extract": "Extract!"
             },
             "checkboxes": {
-                
-            }
-            
+                "call_history": "Call History",
+                "calendar": "Calendar",
+                "camera_roll": "Camera Roll",
+                "contacts": "Contacts",
+                "notes": "Notes",
+                "sms_imessage": "SMS & iMessage",
+                "voice_memos": "Voice Memos",
+                "voicemail_messages": "Voicemail Messages"
+            },
+            "device_info": {
+                "model": "Model:",
+                "ios_version": "iOS Version:",
+                "serial_number": "Serial Number",
+                "IMEI": "IMEI"
+            },
+            "backup_info": {
+                "backup_info": "**Backup Info**",
+                "date": "Date:",
+                "itunes_version": "iTunes version:",
+                "encrypted": "Encrypted:",
+                "passcode_set": "Passcode set:"
+            },
+            "extract": "**Extract:**"
         }
     }
 }
