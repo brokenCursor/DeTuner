@@ -279,7 +279,7 @@ class DeMainUILayout(object):
             _translate("MainWindow", "Extract notes?"))
         self.notes_checkbox.setText(_translate("MainWindow", "Notes"))
         self.sms_checkbox.setStatusTip(_translate(
-            "MainWindow", "Extract SMS & iMessage message history?"))
+            "MainWindow", "Extract SMS & iMessage chat history?"))
         self.sms_checkbox.setText(_translate("MainWindow", "SMS &&  iMessage"))
         self.voice_memos_checkbox.setStatusTip(
             _translate("MainWindow", "Extract Voice Memos?"))

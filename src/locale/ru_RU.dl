@@ -1,9 +1,10 @@
 {
+    "format": "detuner_locale",
     "version": "0.0.1",
-    "locale": "en_US",
-    "language": "English",
+    "locale": "ru_RU",
+    "language": "Русский",
     "strings": {
-        "main_ui": {
+        "main_window": {
             "menubar": {
                 "file_menu": "File"
             },
@@ -17,7 +18,8 @@
                 "add_backup": "Add backup",
                 "extract": "Extract!"
             },
-            "checkboxes": {
+            "extraction_settings": {
+                "extract": "Extract:",
                 "call_history": "Call History",
                 "calendar": "Calendar",
                 "camera_roll": "Camera Roll",
@@ -39,8 +41,7 @@
                 "itunes_version": "iTunes version:",
                 "encrypted": "Encrypted:",
                 "passcode_set": "Passcode set:"
-            },
-            "extract": "**Extract:**"
+            }
         }
     }
 }
