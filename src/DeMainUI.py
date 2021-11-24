@@ -3,10 +3,9 @@ import sys
 import os
 from DeWorker import DeWorker
 from ui.DeMainUILayout import DeMainUILayout
-from ui.DeQuitLayout import DeQuitLayout
 from ui.DeQuitDialogLayout import DeQuitDialogLayout
 from DeBackup import DeBackup, InvalidBackupException
-from DeBackupHandler import DeBackupHandler
+from DeBackupHandler import DeBackupHandler 
 from DeSettingsManager import DeSettingsManager
 from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar, QMainWindow
 from PyQt5.QtGui import QIcon, QPixmap
