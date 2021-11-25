@@ -92,6 +92,7 @@ class DeMainUILayout(object):
             QtCore.Qt.TextSelectableByMouse)
         self.imei_label.setObjectName("imei_label")
         self.device_info_layout.addWidget(self.imei_label)
+        
         self.line = QtWidgets.QFrame(self.centralwidget)
         self.line.setGeometry(QtCore.QRect(290, 150, 381, 20))
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
@@ -107,6 +108,7 @@ class DeMainUILayout(object):
         self.line_3.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_3.setObjectName("line_3")
+        
         self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget_2.setGeometry(
             QtCore.QRect(290, 200, 160, 231))
@@ -170,11 +172,13 @@ class DeMainUILayout(object):
         self.extract_label.setTextFormat(QtCore.Qt.MarkdownText)
         self.extract_label.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
         self.extract_label.setObjectName("extract_label")
+        
         self.line_4 = QtWidgets.QFrame(self.centralwidget)
         self.line_4.setGeometry(QtCore.QRect(480, 300, 191, 20))
         self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_4.setObjectName("line_4")
+        
         self.start_button = QtWidgets.QPushButton(self.centralwidget)
         self.start_button.setEnabled(False)
         self.start_button.setGeometry(QtCore.QRect(460, 390, 211, 41))
@@ -221,29 +225,41 @@ class DeMainUILayout(object):
         self.status_bar.setSizeGripEnabled(False)
         self.status_bar.setObjectName("status_bar")
         MainWindow.setStatusBar(self.status_bar)
+
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setEnabled(True)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 680, 21))
         self.menubar.setObjectName("menubar")
+
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
+        
+        self.menuWindow = QtWidgets.QMenu(self.menubar)
+        self.menuWindow.setObjectName("menuWindow")
+        
         MainWindow.setMenuBar(self.menubar)
+
         self.action_add_backup = QtWidgets.QAction(MainWindow)
         self.action_add_backup.setCheckable(False)
         self.action_add_backup.setObjectName("action_add_backup")
+        
         self.action_export = QtWidgets.QAction(MainWindow)
         self.action_export.setCheckable(False)
         self.action_export.setObjectName("action_export")
+        
         self.action_exit = QtWidgets.QAction(MainWindow)
         self.action_exit.setCheckable(False)
         self.action_exit.setObjectName("action_exit")
+        
         self.action_delete_backup = QtWidgets.QAction(MainWindow)
         self.action_delete_backup.setObjectName("action_delete_backup")
+        
         self.menuFile.addAction(self.action_add_backup)
         self.menuFile.addAction(self.action_delete_backup)
         self.menuFile.addAction(self.action_export)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.action_exit)
+        
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)

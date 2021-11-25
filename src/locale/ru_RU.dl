@@ -79,7 +79,7 @@
             "cancel_button": "Отмена"
         },
         "handler": {
-            "backup_directory_prefix": "Backup_",
+            "backup_dir_prefix": "Резервная_копия_",
             "camera_roll": {
                 "directory": "Camera Roll"
             },

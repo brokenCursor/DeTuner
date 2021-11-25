@@ -72,7 +72,7 @@
             }
         },
         "quit_dialog": {
-            "title": "Quit?",
+            "window_title": "Quit?",
             "label": "Quit DeTuner?",
             "quit_button": "Quit",
             "cancel_button": "Cancel"
@@ -139,14 +139,14 @@
             "extraction_canceled": "Extraction canceled",
             "backup_already_added": "This backup has already been added",
             "extraction_completed": "Extraction completed"
+        },
+        "get_dir_path": {
+            "select_backup_dir": "Select backup directory",
+            "select_output_dir": "Select output directory"
+        },
+        "passcode_dialog": {
+            "title": "Enter passcode",
+            "body": "This backup requires passcode for extraction"
         }
-    },
-    "get_dir_path": {
-        "select_backup_dir": "Select backup directory",
-        "select_output_dir": "Select output directory"
-    },
-    "passcode_dialog": {
-        "title": "Enter passcode",
-        "body": "This backup requires passcode for extraction"
     }
 }
