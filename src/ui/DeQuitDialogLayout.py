@@ -6,8 +6,9 @@ import typing
 
 
 class DeQuitDialogLayout(QtWidgets.QDialog):
-    def __init__(self, parent) -> None:
+    def __init__(self, parent, locale) -> None:
         super().__init__(parent=parent)
+        self.strings = locale
 
     def setupUi(self, DeQuitDialogLayout):
         DeQuitDialogLayout.setObjectName("DeQuitDialogLayout")
@@ -40,14 +41,17 @@ class DeQuitDialogLayout(QtWidgets.QDialog):
 
         self.quit_button.clicked.connect(self.accept)
         self.cancel_button.clicked.connect(self.reject)
-        
+
         self.retranslateUi(DeQuitDialogLayout)
         QtCore.QMetaObject.connectSlotsByName(DeQuitDialogLayout)
 
     def retranslateUi(self, DeQuitDialogLayout):
         _translate = QtCore.QCoreApplication.translate
         DeQuitDialogLayout.setWindowTitle(
-            _translate("DeQuitDialogLayout", "Dialog"))
-        self.label.setText(_translate("DeQuitDialogLayout", "Quit DeTuner?"))
-        self.quit_button.setText(_translate("DeQuitDialogLayout", "Quit"))
-        self.cancel_button.setText(_translate("DeQuitDialogLayout", "Cancel"))
+            _translate("DeQuitDialogLayout", self.strings["title"]))
+        self.label.setText(_translate(
+            "DeQuitDialogLayout", self.strings["label"]))
+        self.quit_button.setText(_translate(
+            "DeQuitDialogLayout", self.strings["quit_button"]))
+        self.cancel_button.setText(_translate(
+            "DeQuitDialogLayout", self.strings["cancel_button"]))

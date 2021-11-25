@@ -73,22 +73,22 @@
             }
         },
         "quit_dialog": {
-            "window_title": "Quit?",
-            "label": "Quit DeTuner?",
-            "quit_button": "Quit",
-            "cancel_button": "Cancel"
+            "title": "Выйти?",
+            "label": "Выйти из DeTuner?",
+            "quit_button": "Выйти",
+            "cancel_button": "Отмена"
         },
         "handler": {
             "backup_directory_prefix": "Backup_",
-            "camera_roll":{
+            "camera_roll": {
                 "directory": "Camera Roll"
             },
             "voice_memos": {
                 "directory": "Voice Memos"
             },
-            "contacts":{
+            "contacts": {
                 "directory": "Contacts",
-                "file_name": "Contacts"    
+                "file_name": "Contacts"
             },
             "call_history": {
                 "directory": "Call History",
@@ -98,7 +98,7 @@
                     "Phone Number",
                     "Date",
                     "Duration"
-                ]    
+                ]
             },
             "calendar": {
                 "directory": "Calendar",
@@ -115,39 +115,39 @@
                 "chat_history_file_name": "chat_history",
                 "msg_template": ""
             },
-            "voicemail":{
+            "voicemail": {
                 "directory": "Voicemail",
                 "metadata_file_name": "Voicemail Metadata"
             }
         },
-        "messages":{
-            "codes":{
-                "warning": "Warning",
-                "error": "Error!",
-                "info": "Info"    
+        "messages": {
+            "codes": {
+                "warning": "Предупреждение",
+                "error": "Ошибка!",
+                "info": "Информация"
             },
-            "texts":{
-                "no_backups_found": "No backups found!",
-                "unable_to_delete_no_selected": "Unable to delete backup: no backup selected!",
-                "unable_to_delete_default": "Unable to delete backup from default directory",
-                "no_backup_selected": "No backup selected!",
-                "empty_passcode": "Empty passcode provided!",
-
-                "unable_to_decrypt": "Unable to decrypt backup: incorrect password?",
-                "thread_start_error": "Critical error while starting thread",
-                "unable_to_import": "Unable to import backup {backup_id}: invalid backup",
-                "unknown_import_error": "An unknown error ocurred during backup import",
-                "unable_to_import_external": "Unable to import external backup",
-                "extraction_start_error": "Critical error while starting extraction",
-
-                "extraction_canceled": "Extraction canceled",
-                "backup_already_added": "This backup has already been added",
-                "extraction_completed": "Extraction completed"
-            }
+            "no_backups_found": "Резервные копии не найдены!",
+            "unable_to_delete_no_selected": "Резервная копия не выбрана!",
+            "unable_to_delete_default": "Невозможно удалить РК из стандартной директории",
+            "no_backup_selected": "Резервная копия не выбрана!",
+            "empty_passcode": "Введён пустой пароль!",
+            "unable_to_decrypt": "Ошибка расшифровывания РК: неверный пароль?",
+            "thread_start_error": "Критическая ошибка запуска потока",
+            "unable_to_import": "Ошибка импортирования РК {backup_id}: недействительная РК",
+            "unknown_import_error": "В ходе импортирования РК возникла неизвестная ошибка",
+            "unable_to_import_external": "Ошибка при импортировании сторонней РК",
+            "extraction_start_error": "Критическая ошибка запуска извлечения",
+            "extraction_canceled": "Извлечение отменено",
+            "backup_already_added": "Эта резервная копия уже добавлена",
+            "extraction_completed": "Извлечение завершено"
         },
-        "get_dir_path":{
-            "select_backup_dir": "Select backup directory",
-            "select_output_dir": "Select output directory"
+        "get_dir_path": {
+            "select_backup_dir": "Выберите папку резервной копии",
+            "select_output_dir": "Выберите путь для извлечения"
+        },
+        "passcode_dialog": {
+            "title": "Введите пароль",
+            "body": "Данная резервная копия требует пароля для извлечения"
         }
     }
 }

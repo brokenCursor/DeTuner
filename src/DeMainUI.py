@@ -23,7 +23,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         # Load settings
         self.__settings_manager = DeSettingsManager()
-        
+
         # Load locale strings
         system_locale = self.__locale_manager.get_system_locale()
         if system_locale in [loc[0] for loc in
@@ -67,7 +67,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.import_default_backups()
         self.import_known_external_backups()
         if not self.__backups:
-            self.show_warning("No backups found!")
+            self.show_warning(
+                self.locale_strings["messages"]["no_backups_found"])
 
     def bind_buttons(self):
         """ Attach button's "clicked" signal to it's function """
@@ -116,25 +117,28 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             return
 
         # Fill in device info
+        dev_strings = self.locale_strings["main_window"]["device_info"]
         self.device_name_label.setText('**' + backup.device_name() + '**')
-        self.model_label.setText("Model: " + backup.product_name())
+        self.model_label.setText(
+            dev_strings["model"] + " " + backup.product_name())
         self.ios_version_label.setText(
-            "iOS Version: " + backup.ios_version())
+            dev_strings["ios_version"] + " " + backup.ios_version())
         self.serial_number_label.setText("S/N: " + backup.serial_number())
-        self.imei_label.setText("IMEI: " + backup.imei())
+        self.imei_label.setText(dev_strings["imei"] + " " + backup.imei())
         icon_filename = backup.product_type()
         pixmap = QPixmap(f"./assets/device_icons/{icon_filename}", ).scaled(
             80, 130, aspectRatioMode=1)
         self.device_image.setPixmap(pixmap)
 
         # Fill in backup info
+        backup_strings = self.locale_strings["main_window"]["backup_info"]
         self.backup_date_label.setText(
-            "Date: " + backup.last_backup_date())
+            backup_strings["date"] + " " + backup.last_backup_date())
         self.backup_itunes_ver_label.setText(
-            "iTunes version: " + backup.itunes_version())
-        self.backup_is_encrypted_label.setText("Encrypted: " +
+            backup_strings["itunes_version"] + " " + backup.itunes_version())
+        self.backup_is_encrypted_label.setText(backup_strings["encrypted"] + " " +
                                                str(backup.is_encrypted()))
-        self.backup_passcode_set_label.setText("Passcode set: " +
+        self.backup_passcode_set_label.setText(backup_strings["passcode_set"] + " " +
                                                str(backup.is_passcode_set()))
 
         # Enable UI elements
@@ -145,18 +149,20 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         """ Reset backup UI elements to their default states """
 
         # Reset device info
-        self.device_name_label.setText('**Device Name**')
-        self.model_label.setText("Model:")
-        self.ios_version_label.setText("iOS Version:")
-        self.serial_number_label.setText("Serial Number:")
-        self.imei_label.setText("IMEI:")
-        self.device_image.setText("SELECT BACKUP")
+        dev_strings = self.locale_strings["main_window"]["device_info"]
+        self.device_name_label.setText(dev_strings["device_name_label"])
+        self.model_label.setText(dev_strings["model"])
+        self.ios_version_label.setText(dev_strings["ios_version"])
+        self.serial_number_label.setText(dev_strings["serial_number"])
+        self.imei_label.setText(dev_strings["imei"])
+        self.device_image.setText(dev_strings["device_image"])
 
         # Reset in backup info
-        self.backup_date_label.setText("Date:")
-        self.backup_itunes_ver_label.setText("iTunes version:")
-        self.backup_is_encrypted_label.setText("Encrypted:")
-        self.backup_passcode_set_label.setText("Passcode set:")
+        backup_strings = self.locale_strings["main_window"]["backup_info"]
+        self.backup_date_label.setText(backup_strings["date"])
+        self.backup_itunes_ver_label.setText(backup_strings["itunes_version"])
+        self.backup_is_encrypted_label.setText(backup_strings["encrypted"])
+        self.backup_passcode_set_label.setText(backup_strings["passcode_set"])
 
         # Disable UI elements
         self.set_checkboxes_enabled(False)
@@ -166,15 +172,18 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         """ Delete selected backup if selected backup is external """
 
         backup = self.get_selected_backup()
-        if not backup:  # If no backup selected
-            self.show_warning('Unable to delete backup: no backup selected!')
-        backup_path = backup.get_path()
-        if r'\AppData\Roaming\Apple Computer\MobileSync\Backup' not in backup_path:
-            self.__settings_manager.delete_external_backup(backup_path)
-            self.__backups.remove(backup)
-            self.update_table()
+        if backup:  # If no backup selected
+            backup_path = backup.get_path()
+            if r'\AppData\Roaming\Apple Computer\MobileSync\Backup' not in backup_path:
+                self.__settings_manager.delete_external_backup(backup_path)
+                self.__backups.remove(backup)
+                self.update_table()
+            else:
+                self.show_warning(
+                    self.locale_strings["messages"]["unable_to_delete_default"])
         else:
-            self.show_warning('Unable to delete backup from default directory')
+            self.show_warning(
+                self.locale_strings["messages"]["unable_to_delete_no_selected"])
 
     def set_checkboxes_enabled(self, enable: bool = True):
         """ Enable/disable checkboxes """
@@ -230,17 +239,17 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         try:
             if path in [b.get_path() for b in self.__backups]:
-                self.show_info("This backup has already been added")
+                self.show_info(
+                    self.locale_strings["messages"]["backup_already_added"])
             else:
                 self.__backups.append(DeBackup(path))
         except InvalidBackupException as e:
             id = path.split('\\')[-1]
-            self.show_error(
-                "Unable to import backup {backup_id}: \
-                    invalid backup".format(backup_id=id), details=str(e))
+            self.show_error(self.locale_strings["messages"]["unable_to_import"].format(
+                backup_id=id), details=str(e))
         except Exception as e:
             self.show_error(
-                'An unknown error ocurred during backup import', details=str(e))
+                self.locale_strings["messages"]["unknown_import_error"], details=str(e))
 
     def update_table(self):
         """ Clear and fill in table with list of backups """
@@ -256,17 +265,20 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def add_external_backup(self):
         ''' Add backup from user-provided location '''
 
-        path = self.get_dir_path("Select backup directory")
+        path = self.get_dir_path(
+            self.locale_strings["get_dir_path"]["select_backup_dir"])
         if path:
             try:
                 self.import_backup(path)
             except Exception as e:
-                self.show_error("Unable to import external backup", details=e)
+                self.show_error(
+                    self.locale_strings["messages"]["unable_to_import_external"], details=e)
             else:
                 self.__settings_manager.add_external_backup(path)
                 self.update_table()
         else:
-            self.show_warning("No backup selected!")
+            self.show_warning(
+                self.locale_strings["messages"]["no_backup_selected"])
 
     def get_dir_path(self, title, start: str = '.') -> str | None:
         ''' Return path to a user-selected directory '''
@@ -325,24 +337,31 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         ''' A warning wrapper for show_message function'''
 
         return self.show_message(message, QMessageBox.Warning,
-                                 'Warning', **kwargs)
+                                 self.locale_strings["messages"]["codes"]["warning"],
+                                 **kwargs)
 
     def show_error(self, message, **kwargs) -> None | str:
         ''' An error wrapper for show_message function'''
 
         return self.show_message(message, QMessageBox.Critical,
-                                 'Error!', **kwargs)
+                                 self.locale_strings["messages"]["codes"]["error"],
+                                 **kwargs)
 
     def show_info(self, message, **kwargs) -> None | str:
         ''' An info wrapper for show_message function'''
 
         return self.show_message(message, QMessageBox.Information,
-                                 'Info', **kwargs)
+                                 self.locale_strings["messages"]["codes"]["info"],
+                                 **kwargs)
 
     def get_selected_backup(self) -> DeBackup | None:
         ''' Get selected backup '''
 
         index = self.backup_table.currentRow()
+        self.backup_table.setCurrentRow(index)
+
+        if index == -1:
+            return None
         try:
             return self.__backups[index]
         except:
@@ -350,12 +369,12 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
     def get_passcode(self) -> tuple:
         """ Show a QInputDialog for user to enter encryption passcode """
+        strings = self.locale_strings["passcode_dialog"]
 
         dialog = QInputDialog()
         dialog.setTextEchoMode(QLineEdit.EchoMode.Password)
         passcode, result = dialog.getText(
-            self, 'Enter passcode',
-            'This backup requires passcode for extraction',
+            self, strings["title"], strings["body"],
             QLineEdit.EchoMode.Password)
         return passcode, result
 
@@ -384,7 +403,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             del self.__handler
             self.progress_bar.reset()
             self.progress_bar.hide()
-            self.show_info("Extraction completed")
+            self.show_info(
+                self.locale_strings["messages"]["extraction_completed"])
             self.set_ui_enabled(True)
 
     def start_extraction(self):
@@ -392,7 +412,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         # Get backup from table
         backup = self.get_selected_backup()
         if not backup:
-            self.show_warning("No backup selected!")
+            self.show_warning(
+                self.locale_strings["messages"]["no_backup_selected"])
             return
 
         # Get passcode
@@ -400,10 +421,12 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             while True:
                 passcode, result = self.get_passcode()
                 if not result:  # If user canceled/closed window
-                    self.show_info('Extraction canceled')
+                    self.show_info(
+                        self.locale_strings["messages"]["extraction_canceled"])
                     return
                 elif passcode == '':
-                    self.show_warning('Empty passcode provided!')
+                    self.show_warning(
+                        self.locale_strings["messages"]["empty_passcode"])
                 else:
                     break
             self.easter_egg(passcode)
@@ -440,16 +463,18 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
             if not decryption_result:
                 self.show_error(
-                    "Unable to decrypt backup: incorrect password?")
+                    self.locale_strings["messages"]["unable_to_decrypt"])
                 self.finish_extraction(force=True)
                 return
 
         # Get output directory
         last_output_dir = self.__settings_manager.get_last_export_path()
         output_dir = self.get_dir_path(
-            "Select output directory", last_output_dir)
+            self.locale_strings["get_dir_path"]["select_output_dir"],
+            last_output_dir)
         if not output_dir:
-            self.show_info('Extraction canceled')
+            self.show_info(
+                self.locale_strings["messages"]["extraction_canceled"])
             self.set_ui_enabled(True)
             return
 
@@ -471,7 +496,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 self.__threadpool.start(worker)
             except Exception as e:
                 self.show_error(
-                    "Critical error while starting thread", details=e)
+                    self.locale_strings["messages"]["thread_start_error"], details=e)
 
         # Start extraction threads
         self.status_bar.showMessage('Extracting...')
@@ -494,11 +519,12 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 start_thread(self.__handler.extract_call_history)
         except Exception as e:
             self.show_error(
-                "Critical error while starting extraction", details=e)
+                self.locale_strings["messages"]["extraction_start_error"], details=e)
 
     def quit(self):
         """ Show "Quit?" dialog """
-        self.quit_dialog = DeQuitDialogLayout(self)
+        self.quit_dialog = DeQuitDialogLayout(self,
+                                              self.locale_strings["quit_dialog"])
         self.quit_dialog.setupUi(self.quit_dialog)
         if self.quit_dialog.exec():
             sys.exit(0)
