@@ -381,16 +381,26 @@ class DeBackupHandler:
                 prev_progress = 0
 
             # Write events to file
-            with open(path + '/Calendar.txt', 'w') as f:
+            with open(path + os.sep + strings["file_name"] +'.txt', 'w') as f:
                 for event_data in calendar_db:
                     summary, start_date, end_date, \
                         all_day_flag, description = event_data
                     # Generate event string
-                    event = "Summary: {summ}\nStart: {start}\n{end}\n"
-                    '''event = f'Summary: {summary}\n'
-                    event += f'Start: {start_date}\n'
-                    event += f'End: {end_date}\n' if all_day_flag else 'All day\n'
-                    event += f'Description:\n{description}\n\n' if description else '\n\''''
+                    event = ''
+                    event += strings["templates"]["summary"].format(
+                        summ=summary)
+                    event += strings["templates"]["start"].format(
+                        start=start_date)
+                    if all_day_flag:
+                        event += strings["templates"]["all_day"]
+                    else:
+                        event += strings["templates"]["end"].format(
+                            end=end_date)
+                    if description:
+                        event += strings["templates"]["description"].format(
+                            desc=description)
+                    else:
+                        event += '\n\n'
                     f.write(event)
 
                     # If progress callback provided, emit progress
@@ -413,8 +423,11 @@ class DeBackupHandler:
     def extract_notes(self, **kwargs):
         ''' Extract notes from Notes app '''
 
+        # Get strings from locale
+        strings = self.__locale["notes"]
+
         # Set output path
-        path = self.__output_dir + '/Notes'
+        path = self.__output_dir + os.sep + strings["directory"]
         if self.__backup.is_encrypted():
             # Find Notes database
             try:
@@ -465,13 +478,31 @@ class DeBackupHandler:
                 # Build note
                 note_id, title, summary, content, \
                     deleted_flag, created, modified = note
-                note_string = 'Title: ' + title + '\n' if title else 'Title: No title\n'
-                note_string += 'Created: ' + created + '\n'
-                note_string += 'Last modified: ' + modified + '\n'
-                note_string += 'Summary: ' + summary + '\n' if summary else 'Title: No summary\n'
-                note_string += 'Is deleted:' + 'True\n' if deleted_flag else 'False\n'
-                note_string += 'Content:\n' + content + '\n'
-                note_path = path + title + '.txt' if title else 'No_title.txt'
+
+                if title:
+                    note_string = strings["templates"]["title"].format(
+                        title=title)
+                else:
+                    note_string = strings["templates"]["no_title"]
+                note_string += strings["templates"]["created"].format(
+                    date=created)
+
+                note_string += strings["templates"]["last_modified"].format(
+                    date=modified)
+
+                if summary:
+                    note_string += strings["templates"]["summary"].format(
+                        summ=summary)
+                else:
+                    note_string += strings["templates"]["no_summary"]
+
+                note_string += strings["templates"]["is_deleted"].format(
+                    val=bool(deleted_flag))
+                note_string += strings["templates"]["content"].format(
+                    cont=content)
+
+                note_path = path + os.sep + \
+                    title if title else strings["no_title_file_name"] + '.txt'
 
                 # Write note to file
                 with open(note_path, 'w') as f:
@@ -499,7 +530,14 @@ class DeBackupHandler:
             pass
 
     def extract_sms_imessage(self, **kwargs):
-        path = self.__output_dir + '/SMS & iMessage'
+        """ Extract SMS and iMessage chat history """
+
+        # Get strings from locale
+        strings = self.__locale["sms_imessage"]
+
+        # Set output path
+        path = self.__output_dir + os.sep + strings["directory"]
+
         if self.__backup.is_encrypted():
             # Find SMS database
             try:
@@ -563,7 +601,8 @@ class DeBackupHandler:
                     f'/{handle_raw_id if handle_raw_id else handle_id} ({service})'
                 os.makedirs(chat_path)
                 # Create attachments directory
-                attachments_path = chat_path + '/Attachments'
+                attachments_path = chat_path + os.sep + \
+                    strings["attachments_directory"]
                 os.makedirs(attachments_path)
 
                 # Save messages
@@ -572,16 +611,27 @@ class DeBackupHandler:
                     # Extract message data
                     msg_id, text, is_from_me, date, date_delivered, date_read = msg
                     # Generate message string
-                    msg_string = f'ID: {msg_id}\n'
-                    msg_string = 'From: me\n' if is_from_me else f'From: {handle_id}\n'
+                    msg_string = strings["templates"]["id"].format(id=msg_id)
+
+                    if is_from_me:
+                        msg_string += strings["templates"]["from_me"]
+                    else:
+                        msg_string += strings["templates"]["from"].format(
+                            handle=handle_id)
+
                     if date:
-                        msg_string += f'Date: {date}\n'
-                    msg_string += f'Delivered: {date_delivered}\n'
-                    msg_string += f'Read: {date_read}\n'
-                    msg_string += f'-----------\n{text}\n\n'
+                        msg_string += strings["templates"]["date"].format(
+                            date=date)
+
+                    msg_string += strings["templates"]["delivered"].format(
+                        date=date_delivered)
+                    msg_string += strings["templates"]["read"].format(
+                        date=date_read)
+                    msg_string += strings["templates"]["content"].format(
+                        text=text)
 
                     # Write to file
-                    with open(chat_path + '/chat_history.txt', 'a', encoding='UTF-16') as f:
+                    with open(chat_path + os.sep + strings["chat_file_name"] + '.txt', 'a', encoding='UTF-16') as f:
                         f.write(msg_string)
                     f.close()
 
@@ -612,7 +662,12 @@ class DeBackupHandler:
             os.remove(sms_db_path)
 
     def extract_voicemail(self, **kwargs):
-        path = self.__output_dir + '/Voicemail'
+        """ Extact voicemail recordings and metadata """
+        # Get strings from locale
+        strings = self.__locale["notes"]
+
+        # Set output path
+        path = self.__output_dir + os.sep + strings["directory"]
         if self.__backup.is_encrypted():
             # Connect to manifest.db
             try:
@@ -683,12 +738,15 @@ class DeBackupHandler:
 
                 # Generate metadata string
                 sender, duration, date = metadata
-                metadata_string = f'Sender: {sender}\n'
-                metadata_string += f'Date: {date}\n'
-                metadata_string += f'Duration: {duration}\n\n'
+                metadata_string = strings["templates"]["sender"].format(
+                    sender=sender)
+                metadata_string += strings["templates"]["date"].format(
+                    date=date)
+                metadata_string += strings["templates"]["duration"].format(
+                    dur=duration)
 
                 # Save metadata string to file
-                with open(path + '/Voicemail Metadata.txt', 'w') as f:
+                with open(path + os.sep + strings["file_name"] + '.txt', 'w') as f:
                     f.write(metadata_string)
                     f.close
 

@@ -81,43 +81,72 @@
         "handler": {
             "backup_dir_prefix": "Резервная_копия_",
             "camera_roll": {
-                "directory": "Camera Roll"
+                "directory": "Галерея"
             },
             "voice_memos": {
-                "directory": "Voice Memos"
+                "directory": "Диктофон"
             },
             "contacts": {
-                "directory": "Contacts",
-                "file_name": "Contacts"
+                "directory": "Контакты",
+                "file_name": "Список контактов"
             },
             "call_history": {
-                "directory": "Call History",
-                "file_name": "Call History",
+                "directory": "История звонков",
+                "file_name": "История звонков",
                 "header": [
                     "ID",
-                    "Phone Number",
-                    "Date",
-                    "Duration"
+                    "Номер телефона",
+                    "Дата и время",
+                    "Продолжительность"
                 ]
             },
             "calendar": {
-                "directory": "Calendar",
-                "file_name": "Calendar",
-                "event_template": ""
+                "directory": "Календарь",
+                "file_name": "События",
+                "templates": {
+                    "summary": "Название: {summ}\n",
+                    "start": "Начало: {start}\n",
+                    "end": "Окончание: {end}\n",
+                    "all_day": "Весь день\n",
+                    "description": "Описание:\n{desc}\n\n"
+                }
             },
             "notes": {
-                "directory": "Notes",
-                "note_template": ""
+                "directory": "Заметки",
+                "no_title_file_name": "Без_названия",
+                "templates": {
+                    "title": "Название: {title}\n",
+                    "no_title": "Название: Без названия\n",
+                    "created": "Создана: {date}\n",
+                    "last_modified": "Последнее изменение: {date}\n",
+                    "summary": "Описание: {summ}\n",
+                    "no_summary": "Описание: Отсутствует\n",
+                    "is_deleted": "Удалена: {val}\n",
+                    "content": "Текст:\n{cont}\n"
+                }
             },
             "sms_imessage": {
-                "directory": "SMS & iMessage",
-                "attachments_directory": "Attachments",
-                "chat_history_file_name": "chat_history",
-                "msg_template": ""
+                "directory": "СМС & iMessage",
+                "attachments_directory": "Прикреплённые файлы",
+                "chat_file_name": "история_сообщений",
+                "templates": {
+                    "id": "ID: {id}\n",
+                    "from": "От: {handle}\n",
+                    "from_me": "От: меня\n",
+                    "date": "Дата: {date}\n",
+                    "delivered": "Доставлено: {date}\n",
+                    "read": "Прочитано: {date}\n",
+                    "content": "-----------\n{text}\n\n"
+                }
             },
             "voicemail": {
-                "directory": "Voicemail",
-                "metadata_file_name": "Voicemail Metadata"
+                "directory": "Голосовая почта",
+                "file_name": "Метаданные голосовой почты",
+                "templates": {
+                    "sender": "Отправитель: {sender}\n",
+                    "date": "Дата: {date}\n",
+                    "duration": "Продолжительность: {dur}\n\n"
+                }
             }
         },
         "messages": {

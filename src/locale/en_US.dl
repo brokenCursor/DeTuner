@@ -78,7 +78,7 @@
             "cancel_button": "Cancel"
         },
         "handler": {
-            "backup_directory_prefix": "Backup_",
+            "backup_dir_prefix": "Backup_",
             "camera_roll": {
                 "directory": "Camera Roll"
             },
@@ -102,21 +102,50 @@
             "calendar": {
                 "directory": "Calendar",
                 "file_name": "Calendar",
-                "event_template": ""
+                "templates": {
+                    "summary": "Summary: {summ}\n",
+                    "start": "Start: {start}\n",
+                    "end": "End: {end}\n",
+                    "all_day": "All day\n",
+                    "description": "Description:\n{desc}\n\n"
+                }
             },
             "notes": {
                 "directory": "Notes",
-                "note_template": ""
+                "no_title_file_name": "No_title",
+                "templates": {
+                    "title": "Title: {title}\n",
+                    "no_title": "Title: No title\n",
+                    "created": "Created: {date}\n",
+                    "last_modified": "Last modified: {date}\n",
+                    "summary": "Summary: {summ}\n",
+                    "no_summary": "Summary: No summary\n",
+                    "is_deleted": "Is deleted: {val}\n",
+                    "content": "Content:\n{cont}\n"
+                }
             },
             "sms_imessage": {
                 "directory": "SMS & iMessage",
                 "attachments_directory": "Attachments",
-                "chat_history_file_name": "chat_history",
-                "msg_template": ""
+                "chat_file_name": "chat_history",
+                "templates": {
+                    "id": "ID: {id}\n",
+                    "from": "From: {handle}\n",
+                    "from_me": "From: me\n",
+                    "date": "Date: {date}\n",
+                    "delivered": "Delivered: {date}\n",
+                    "read": "Read: {date}\n",
+                    "content": "-----------\n{text}\n\n"
+                }
             },
             "voicemail": {
                 "directory": "Voicemail",
-                "metadata_file_name": "Voicemail Metadata"
+                "file_name": "Voicemail Metadata",
+                "templates": {
+                    "sender": "Sender: {sender}\n",
+                    "date": "Date: {date}\n",
+                    "duration": "Duration: {dur}\n\n"
+                }
             }
         },
         "messages": {

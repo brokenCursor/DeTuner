@@ -437,7 +437,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         # Extract data
         self.progress_bar.show()
         settings = self.get_checkboxes_states()
-        self.__handler = DeBackupHandler(backup)
+        self.__handler = DeBackupHandler(backup, self.locale_strings["handler"])
 
         # Decrypt, if backup is encrypted
         if backup.is_encrypted():
