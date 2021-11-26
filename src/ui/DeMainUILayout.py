@@ -259,7 +259,7 @@ class DeMainUILayout(object):
         self.menuFile.addAction(self.action_export)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.action_exit)
-        
+            
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)

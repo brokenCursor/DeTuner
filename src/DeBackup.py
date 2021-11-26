@@ -26,7 +26,7 @@ class DeBackup:
         else:
             raise InvalidBackupException("No Manifest.plist file found!")
 
-        if not os.path.isfile(self.__path + './Manifest.db'):
+        if not os.path.isfile(self.__path + '/Manifest.db'):
             raise InvalidBackupException("No Manifest.db file!")
 
     def get_path(self) -> str:
@@ -42,7 +42,7 @@ class DeBackup:
         return self.__info['Build Version']
 
     def device_name(self) -> str:
-        return self.__info['Device Name']
+        return self.__info['Device Name'].strip()
 
     def display_name(self) -> str:
         return self.__info['Display Name']

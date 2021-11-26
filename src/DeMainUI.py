@@ -118,7 +118,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         # Fill in device info
         dev_strings = self.locale_strings["main_window"]["device_info"]
-        self.device_name_label.setText('**' + backup.device_name() + '**')
+        self.device_name_label.setText('**' + backup.display_name() + '**')
         self.model_label.setText(
             dev_strings["model"] + " " + backup.product_name())
         self.ios_version_label.setText(
@@ -417,7 +417,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             return
 
         # Get passcode
-        if backup.is_passcode_set():
+        if backup.is_encrypted():
             while True:
                 passcode, result = self.get_passcode()
                 if not result:  # If user canceled/closed window
