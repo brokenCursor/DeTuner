@@ -13,6 +13,18 @@ class DeQuitDialogLayout(QtWidgets.QDialog):
     def setupUi(self, DeQuitDialogLayout):
         DeQuitDialogLayout.setObjectName("DeQuitDialogLayout")
         DeQuitDialogLayout.resize(201, 104)
+
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            DeQuitDialogLayout.sizePolicy().hasHeightForWidth())
+
+        DeQuitDialogLayout.setSizePolicy(sizePolicy)
+        DeQuitDialogLayout.setMinimumSize(QtCore.QSize(201, 104))
+        DeQuitDialogLayout.setMaximumSize(QtCore.QSize(201, 104))
+
         self.gridLayoutWidget = QtWidgets.QWidget(DeQuitDialogLayout)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 0, 181, 91))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
@@ -41,7 +53,7 @@ class DeQuitDialogLayout(QtWidgets.QDialog):
 
         self.quit_button.clicked.connect(self.accept)
         self.cancel_button.clicked.connect(self.reject)
-
+        self.setWindowFlag(QtCore.Qt.WindowContextHelpButtonHint, False)
         self.retranslateUi(DeQuitDialogLayout)
         QtCore.QMetaObject.connectSlotsByName(DeQuitDialogLayout)
 

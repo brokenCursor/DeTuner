@@ -41,7 +41,8 @@ class DeBackupHandler:
 
     def extract_file(self, relative_path, output_filename):
         if self.__backup.is_encrypted():
-            self.__enc_backup.extract_file(relative_path, output_filename)
+            self.__enc_backup.extract_file(relative_path=relative_path,
+                                           output_filename=output_filename)
         else:
             try:
                 conn = sqlite3.connect(self.__manifest_db)
@@ -250,6 +251,7 @@ class DeBackupHandler:
         with open(path + os.sep + strings["file_name"] + '.txt', 'w', encoding="UTF-16") as f:
             f.write('\t'.join(header) + '\n')
             for contact in addr_db:
+                contact_string = ""
                 f.write(
                     '\t'.join([str(val) for val in contact]) + '\n')
 
@@ -430,7 +432,7 @@ class DeBackupHandler:
         calendar_db_conn.close()
         os.remove(calendar_db_path)
 
-    def extract_notes(self, **kwargs):
+    def extract_notes(self, **kwargs):  
         ''' Extract notes from Notes app '''
 
         # Get strings from locale
@@ -670,11 +672,10 @@ class DeBackupHandler:
     def extract_voicemail(self, **kwargs):
         """ Extact voicemail recordings and metadata """
         # Get strings from locale
-        strings = self.__locale["notes"]
+        strings = self.__locale["voicemail"]
 
         # Set output path
         path = self.__output_dir + os.sep + strings["directory"]
-
         # Connect to manifest.db
         try:
             conn = sqlite3.connect(self.__manifest_db)
