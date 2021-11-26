@@ -88,7 +88,25 @@
             },
             "contacts": {
                 "directory": "Контакты",
-                "file_name": "Список контактов"
+                "file_name": "Список контактов",
+                "templates": {
+                    "id": "ID: {id}\n",
+                    "display_name": "Отображаемое имя: {name}\n",
+                    "first_name": "Имя: {name}\n",
+                    "second_name": "Второе имя: {name}\n",
+                    "middle_name": "Отчество: {name}\n",
+                    "last_name": "Фамилия: {name}\n",
+                    "nickname": "Псевдоним: {nickname}\n",
+                    "organization": "Огранизация: {org}\n",
+                    "job_title": "Должность: {title}\n",
+                    "note": "Заметки: {note}\n",
+                    "birthday": "День рождения: {date}\n",
+                    "phone": "Номер телефона: {phone}\n",
+                    "email": "E-mail: {email}\n",
+                    "social_profile": "Социальный профиль: {profile}\n",
+                    "url": "URL: {url}\n",
+                    "created": "Создан: {date}\n"
+                }
             },
             "call_history": {
                 "directory": "История звонков",

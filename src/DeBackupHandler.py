@@ -240,20 +240,61 @@ class DeBackupHandler:
             prev_progress = 0
             processed_count = 0
 
-        # Setup file header
-        header = ['ID', 'Dispaly Name', 'First Name', 'Second Name',
-                  'Last Name', 'Nickname', 'Organization',
-                  'Department', 'Job Title', 'Note', 'Birthday',
-                  'Phone Number', 'Email', 'Social Profile', 'URL',
-                  'Created']
-
         # Write contacts to file
         with open(path + os.sep + strings["file_name"] + '.txt', 'w', encoding="UTF-16") as f:
-            f.write('\t'.join(header) + '\n')
             for contact in addr_db:
-                contact_string = ""
-                f.write(
-                    '\t'.join([str(val) for val in contact]) + '\n')
+                contact_id, display_name, first_name, second_name, \
+                    middle_name, last_name, nickname, \
+                    organization, job_title, note, birthday, phone, email, social_profile, url,\
+                    created = contact
+                contact_string = strings["templates"]["id"].format(
+                    id=contact_id)
+                if display_name:
+                    contact_string += strings["templates"]["display_name"].format(
+                        name=display_name)
+                if first_name:
+                    contact_string += strings["templates"]["first_name"].format(
+                        name=first_name)
+                if second_name:
+                    contact_string += strings["templates"]["second_name"].format(
+                        name=second_name)
+                if middle_name:
+                    contact_string += strings["templates"]["middle_name"].format(
+                        name=middle_name)
+                if last_name:
+                    contact_string += strings["templates"]["last_name"].format(
+                        name=last_name)
+                if nickname:
+                    contact_string += strings["templates"]["nickname"].format(
+                        nickname=nickname)
+                if organization:
+                    contact_string += strings["templates"]["organization"].format(
+                        org=second_name)
+                if job_title:
+                    contact_string += strings["templates"]["job_title"].format(
+                        title=job_title)
+                if note:
+                    contact_string += strings["templates"]["note"].format(
+                        note=note)
+                if birthday:
+                    contact_string += strings["templates"]["birthday"].format(
+                        date=birthday)
+                if phone:
+                    contact_string += strings["templates"]["phone"].format(
+                        phone=phone)
+                if email:
+                    contact_string += strings["templates"]["email"].format(
+                        email=email)
+                if social_profile:
+                    contact_string += strings["templates"]["social_profile"].format(
+                        profile=social_profile)
+                if url:
+                    contact_string += strings["templates"]["url"].format(
+                        url=url)
+                contact_string += strings["templates"]["created"].format(date=created)
+                contact_string += "--------------------------\n\n"
+
+                f.write(contact_string)
 
                 # If progress callback provided, emit progress
                 if 'progress_callback' in kwargs.keys():
@@ -324,9 +365,9 @@ class DeBackupHandler:
         header = strings["header"]
         with open(path + os.sep + strings["file_name"] + '.txt', 'w') as f:
             f.write('\t'.join(header) + '\n')
-            for contact in call_db:
+            for call in call_db:
                 f.write(
-                    '\t'.join([str(val) for val in contact]) + '\n')
+                    '\t'.join([str(val) for val in call]) + '\n')
 
                 # If progress callback provided, emit progress
                 if 'progress_callback' in kwargs.keys():
@@ -432,7 +473,7 @@ class DeBackupHandler:
         calendar_db_conn.close()
         os.remove(calendar_db_path)
 
-    def extract_notes(self, **kwargs):  
+    def extract_notes(self, **kwargs):
         ''' Extract notes from Notes app '''
 
         # Get strings from locale
