@@ -92,7 +92,7 @@ class DeMainUILayout(object):
             QtCore.Qt.TextSelectableByMouse)
         self.imei_label.setObjectName("imei_label")
         self.device_info_layout.addWidget(self.imei_label)
-        
+
         self.line = QtWidgets.QFrame(self.centralwidget)
         self.line.setGeometry(QtCore.QRect(290, 150, 381, 20))
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
@@ -108,7 +108,7 @@ class DeMainUILayout(object):
         self.line_3.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_3.setObjectName("line_3")
-        
+
         self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget_2.setGeometry(
             QtCore.QRect(290, 200, 160, 231))
@@ -172,13 +172,13 @@ class DeMainUILayout(object):
         self.extract_label.setTextFormat(QtCore.Qt.MarkdownText)
         self.extract_label.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
         self.extract_label.setObjectName("extract_label")
-        
+
         self.line_4 = QtWidgets.QFrame(self.centralwidget)
         self.line_4.setGeometry(QtCore.QRect(480, 300, 191, 20))
         self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_4.setObjectName("line_4")
-        
+
         self.start_button = QtWidgets.QPushButton(self.centralwidget)
         self.start_button.setEnabled(False)
         self.start_button.setGeometry(QtCore.QRect(460, 390, 211, 41))
@@ -233,33 +233,39 @@ class DeMainUILayout(object):
 
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
-        
+
         self.menuWindow = QtWidgets.QMenu(self.menubar)
         self.menuWindow.setObjectName("menuWindow")
-        
+
         MainWindow.setMenuBar(self.menubar)
 
         self.action_add_backup = QtWidgets.QAction(MainWindow)
         self.action_add_backup.setCheckable(False)
         self.action_add_backup.setObjectName("action_add_backup")
-        
+
         self.action_export = QtWidgets.QAction(MainWindow)
         self.action_export.setCheckable(False)
         self.action_export.setObjectName("action_export")
-        
+
         self.action_exit = QtWidgets.QAction(MainWindow)
         self.action_exit.setCheckable(False)
         self.action_exit.setObjectName("action_exit")
-        
+
+        self.action_settings = QtWidgets.QAction(MainWindow)
+        self.action_settings.setCheckable(False)
+        self.action_settings.setObjectName("action_settings")
+
         self.action_delete_backup = QtWidgets.QAction(MainWindow)
         self.action_delete_backup.setObjectName("action_delete_backup")
-        
+
         self.menuFile.addAction(self.action_add_backup)
         self.menuFile.addAction(self.action_delete_backup)
         self.menuFile.addAction(self.action_export)
         self.menuFile.addSeparator()
+        self.menuFile.addAction(self.action_settings)
+        self.menuFile.addSeparator()
         self.menuFile.addAction(self.action_exit)
-            
+
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -401,3 +407,8 @@ class DeMainUILayout(object):
         self.action_delete_backup.setStatusTip(_translate(
             "MainWindow", self.strings["status_tips"]["action_delete_backup"]))
         self.action_delete_backup.setShortcut(_translate("MainWindow", "Del"))
+
+        self.action_settings.setText(_translate(
+            "MainWindow", self.strings["actions"]["settings"]))
+        self.action_settings.setStatusTip(_translate("MainWindow",
+                                                     self.strings["status_tips"]["action_settings"]))

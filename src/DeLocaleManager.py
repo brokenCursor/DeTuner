@@ -17,9 +17,10 @@ class DeLocaleManager:
         # Find all files with .dl extencion
         try:
             file_list = [path for path in os.listdir(
-                r'locale/') if path.split('.')[-1] == 'dl']
+                r'./locale/') if path.split('.')[-1] == 'dl']
         except FileNotFoundError as e:
-            raise Exception(f"Unable to find locales directory!")
+            print(f"Unable to find locales directory!")
+            raise
 
         # If no files found
         if not file_list:
@@ -53,11 +54,12 @@ class DeLocaleManager:
     def set_locale(self, locale_name: str):
         """ Set locale_data to locale data from file """
 
+        # Search for matching names
         locale_match = [
             loc for loc in self.__avaliable_locales if loc[1] == locale_name]
 
         if not locale_match:
-            raise ValueError(f"No \"{locale_match}\" locale found")
+            raise ValueError(f"No \"{locale_name}\" locale found")
 
         try:
             with open(f"locale/{locale_match[0][0]}", "r", encoding="utf-8-sig") as f:

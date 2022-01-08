@@ -9,39 +9,10 @@ import biplist
 
 from . import google_iphone_dataprotection
 
-__all__ = ["EncryptedBackup", "RelativePath", "RelativePathsLike"]
-
-
-class RelativePath:
-    """Relative paths for commonly accessed files."""
-
-    # Standard iOS file locations:
-    ADDRESS_BOOK = "Library/AddressBook/AddressBook.sqlitedb"
-    TEXT_MESSAGES = "Library/SMS/sms.db"
-    CALL_HISTORY = "Library/CallHistoryDB/CallHistory.storedata"
-    NOTES = "Library/Notes/notes.sqlite"
-    HEALTH = "Health/healthdb.sqlite"
-    HEALTH_SECURE = "Health/healthdb_secure.sqlite"
-
-    # Very common external files:
-    WHATSAPP_MESSAGES = "ChatStorage.sqlite"
-    WHATSAPP_CONTACTS = "ContactsV2.sqlite"
-
-
-class RelativePathsLike:
-    """Relative path wildcards for commonly accessed groups of files."""
-
-    # Standard iOS file locations:
-    CAMERA_ROLL = "Media/DCIM/%APPLE/IMG%.%"
-    SMS_ATTACHMENTS = "Library/SMS/Attachments/%.%"
-
-    # WhatsApp paths, which contain "."s and so must search for ".jpg" and ".mp4" individually:
-    WHATSAPP_ATTACHED_IMAGES = "Message/Media/%.jpg"
-    WHATSAPP_ATTACHED_VIDEOS = "Message/Media/%.mp4"
-
-
 # Based on https://stackoverflow.com/questions/1498342/how-to-decrypt-an-encrypted-apple-itunes-iphone-backup
 # and code sample provided by @andrewdotn in this answer: https://stackoverflow.com/a/13793043
+
+# Modified for multithreading by broken_cursor
 class EncryptedBackup:
 
     def __init__(self, *, backup_directory, passphrase):

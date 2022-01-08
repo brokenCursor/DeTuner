@@ -12,7 +12,8 @@
                 "add_backup": "Импорт",
                 "delete_backup": "Удалить",
                 "extract": "Извлечь",
-                "exit": "Выход"
+                "exit": "Выход",
+                "settings": "Настройки"
             },
             "buttons": {
                 "add_backup": "Импортировать РК",
@@ -69,7 +70,8 @@
                 "action_add_backup": "Импортировать РК из нестандартного пути",
                 "action_export": "Запустить извлечение",
                 "action_delete_backup": "Удалить выбранную РК",
-                "action_exit": "Выйти из DeTuner"
+                "action_exit": "Выйти из DeTuner",
+                "action_settings": "Открыть меню настроек"
             }
         },
         "quit_dialog": {

@@ -4,6 +4,7 @@ import os
 from DeWorker import DeWorker
 from ui.DeMainUILayout import DeMainUILayout
 from ui.DeQuitDialogLayout import DeQuitDialogLayout
+from ui.DeSettingsLayout import DeSettingsLayout
 from DeBackup import DeBackup, InvalidBackupException
 from DeBackupHandler import DeBackupHandler
 from DeSettingsManager import DeSettingsManager
@@ -15,7 +16,7 @@ from easter_egg import *
 
 
 class DeMainUI(QMainWindow, DeMainUILayout):
-    ''' The main (temporarely) class of DeTuner app '''
+    ''' The (temporarely) main class of DeTuner app '''
 
     def __init__(self):
         # Load locale data
@@ -70,6 +71,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.show_warning(
                 self.locale_strings["messages"]["no_backups_found"])
 
+
     def bind_buttons(self):
         """ Attach button's "clicked" signal to it's function """
 
@@ -84,6 +86,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.action_exit.triggered.connect(self.quit)
         self.action_delete_backup.triggered.connect(
             self.delete_selected_backup)
+        self.action_settings.triggered.connect(self.open_settings_window)
 
     def import_default_backups(self):
         """ Import backups from default iTunes backup path"""
@@ -437,7 +440,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         # Extract data
         self.progress_bar.show()
         settings = self.get_checkboxes_states()
-        self.__handler = DeBackupHandler(backup, self.locale_strings["handler"])
+        self.__handler = DeBackupHandler(
+            backup, self.locale_strings["handler"])
 
         # Decrypt, if backup is encrypted
         if backup.is_encrypted():
@@ -520,6 +524,12 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         except Exception as e:
             self.show_error(
                 self.locale_strings["messages"]["extraction_start_error"], details=e)
+
+    def open_settings_window(self):
+        self.settings_window = DeSettingsLayout(None, [])
+        self.settings_window.setupUi(self.settings_window)
+        self.settings_window.show()   
+        s    
 
     def quit(self):
         """ Show "Quit?" dialog """

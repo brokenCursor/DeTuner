@@ -6,7 +6,7 @@
     "strings": {
         "main_window": {
             "menubar": {
-                "file_menu": "File"
+                "file": "File"
             },
             "actions": {
                 "add_backup": "Add backup",
@@ -30,11 +30,12 @@
                 "voicemail": "Voicemail Messages"
             },
             "device_info": {
-                "device_label": "SELECT BACKUP",
+                "device_image": "SELECT BACKUP",
+                "device_name_label": "**Device Name**",
                 "model": "Model:",
                 "ios_version": "iOS Version:",
                 "serial_number": "Serial Number",
-                "IMEI": "IMEI"
+                "imei": "IMEI"
             },
             "backup_info": {
                 "backup_info": "**Backup Info**",
