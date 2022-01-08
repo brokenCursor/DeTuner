@@ -1,0 +1,182 @@
+﻿{
+    "format": "detuner_locale",
+    "version": "0.0.1",
+    "locale": "en_US",
+    "language": "English",
+    "strings": {
+        "main_window": {
+            "menubar": {
+                "file": "File"
+            },
+            "actions": {
+                "add_backup": "Add backup",
+                "delete_backup": "Delete backup",
+                "extract": "Extract",
+                "exit": "Exit"
+            },
+            "buttons": {
+                "add_backup": "Add backup",
+                "extract": "Extract!"
+            },
+            "extraction_settings": {
+                "extract": "**Extract:**",
+                "call_history": "Call History",
+                "calendar": "Calendar",
+                "camera_roll": "Camera Roll",
+                "contacts": "Contacts",
+                "notes": "Notes",
+                "sms": "SMS & iMessage",
+                "voice_memos": "Voice Memos",
+                "voicemail": "Voicemail Messages"
+            },
+            "device_info": {
+                "device_image": "SELECT BACKUP",
+                "device_name_label": "**Device Name**",
+                "model": "Model:",
+                "ios_version": "iOS Version:",
+                "serial_number": "Serial Number",
+                "imei": "IMEI"
+            },
+            "backup_info": {
+                "backup_info": "**Backup Info**",
+                "date": "Date:",
+                "itunes_version": "iTunes version:",
+                "encrypted": "Encrypted:",
+                "passcode_set": "Passcode set:"
+            },
+            "status_tips": {
+                "add_backup_button": "Import backup from non-iTunes directory",
+                "backup_table": "Table of imported backups",
+                "device_name_label": "User-specified device name",
+                "device_image": "Device icon",
+                "model_label": "Model name",
+                "ios_version_label": "iOS version",
+                "serial_number_label": "Serial Nubmer",
+                "imei_label": "IMEI",
+                "call_history_checkbox": "Extract call history?",
+                "calendar_checkbox": "Extract calendar data?",
+                "camera_roll_checkbox": "Extract Camera Roll?",
+                "contacts_checkbox": "Extract contacts?",
+                "notes_checkbox": "Extract notes?",
+                "sms_checkbox": "Extract SMS & iMessage chat history?",
+                "voice_memos_checkbox": "Extract Voice Memos?",
+                "voicemail_checkbox": "Extract voicemail?",
+                "start_button": "Start extraction",
+                "backup_date_label": "Date of last backup",
+                "backup_itunes_ver_label": "iTunes version used for backup",
+                "backup_is_encrypted_label": "Was backup encrypted?",
+                "backup_passcode_set_label": "Was passcode set?",
+                "action_add_backup": "Import backup from non-iTunes directory",
+                "action_export": "Start extraction",
+                "action_delete_backup": "Delete selected backup",
+                "action_exit": "Quit DeTuner"
+            }
+        },
+        "quit_dialog": {
+            "window_title": "Quit?",
+            "label": "Quit DeTuner?",
+            "quit_button": "Quit",
+            "cancel_button": "Cancel"
+        },
+        "handler": {
+            "backup_dir_prefix": "Backup_",
+            "camera_roll": {
+                "directory": "Camera Roll"
+            },
+            "voice_memos": {
+                "directory": "Voice Memos"
+            },
+            "contacts": {
+                "directory": "Contacts",
+                "file_name": "Contacts"
+            },
+            "call_history": {
+                "directory": "Call History",
+                "file_name": "Call History",
+                "header": [
+                    "ID",
+                    "Phone Number",
+                    "Date",
+                    "Duration"
+                ]
+            },
+            "calendar": {
+                "directory": "Calendar",
+                "file_name": "Calendar",
+                "templates": {
+                    "summary": "Summary: {summ}\n",
+                    "start": "Start: {start}\n",
+                    "end": "End: {end}\n",
+                    "all_day": "All day\n",
+                    "description": "Description:\n{desc}\n\n"
+                }
+            },
+            "notes": {
+                "directory": "Notes",
+                "no_title_file_name": "No_title",
+                "templates": {
+                    "title": "Title: {title}\n",
+                    "no_title": "Title: No title\n",
+                    "created": "Created: {date}\n",
+                    "last_modified": "Last modified: {date}\n",
+                    "summary": "Summary: {summ}\n",
+                    "no_summary": "Summary: No summary\n",
+                    "is_deleted": "Is deleted: {val}\n",
+                    "content": "Content:\n{cont}\n"
+                }
+            },
+            "sms_imessage": {
+                "directory": "SMS & iMessage",
+                "attachments_directory": "Attachments",
+                "chat_file_name": "chat_history",
+                "templates": {
+                    "id": "ID: {id}\n",
+                    "from": "From: {handle}\n",
+                    "from_me": "From: me\n",
+                    "date": "Date: {date}\n",
+                    "delivered": "Delivered: {date}\n",
+                    "read": "Read: {date}\n",
+                    "content": "-----------\n{text}\n\n"
+                }
+            },
+            "voicemail": {
+                "directory": "Voicemail",
+                "file_name": "Voicemail Metadata",
+                "templates": {
+                    "sender": "Sender: {sender}\n",
+                    "date": "Date: {date}\n",
+                    "duration": "Duration: {dur}\n\n"
+                }
+            }
+        },
+        "messages": {
+            "codes": {
+                "warning": "Warning",
+                "error": "Error!",
+                "info": "Info"
+            },
+            "no_backups_found": "No backups found!",
+            "unable_to_delete_no_selected": "Unable to delete backup: no backup selected!",
+            "unable_to_delete_default": "Unable to delete backup from default directory",
+            "no_backup_selected": "No backup selected!",
+            "empty_passcode": "Empty passcode provided!",
+            "unable_to_decrypt": "Unable to decrypt backup: incorrect password?",
+            "thread_start_error": "Critical error while starting thread",
+            "unable_to_import": "Unable to import backup {backup_id}: invalid backup",
+            "unknown_import_error": "An unknown error ocurred during backup import",
+            "unable_to_import_external": "Unable to import external backup",
+            "extraction_start_error": "Critical error while starting extraction",
+            "extraction_canceled": "Extraction canceled",
+            "backup_already_added": "This backup has already been added",
+            "extraction_completed": "Extraction completed"
+        },
+        "get_dir_path": {
+            "select_backup_dir": "Select backup directory",
+            "select_output_dir": "Select output directory"
+        },
+        "passcode_dialog": {
+            "title": "Enter passcode",
+            "body": "This backup requires passcode for extraction"
+        }
+    }
+}

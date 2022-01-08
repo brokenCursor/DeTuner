@@ -1,1 +1,6 @@
-/.*/
+/.*
+__pycache__
+*test*
+dist
+build
+*.spec

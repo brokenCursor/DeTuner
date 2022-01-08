@@ -1,0 +1,5 @@
+biplist 
+pycryptodome
+plistlib
+PyQT5
+sqlite3

@@ -1,0 +1,202 @@
+﻿{
+    "format": "detuner_locale",
+    "version": "0.0.1",
+    "locale": "ru_RU",
+    "language": "Русский",
+    "strings": {
+        "main_window": {
+            "menubar": {
+                "file": "Файл"
+            },
+            "actions": {
+                "add_backup": "Импорт",
+                "delete_backup": "Удалить",
+                "extract": "Извлечь",
+                "exit": "Выход",
+                "settings": "Настройки"
+            },
+            "buttons": {
+                "add_backup": "Импортировать РК",
+                "extract": "Извлечь!"
+            },
+            "extraction_settings": {
+                "extract": "**Извлечь:**",
+                "call_history": "Историю звонков",
+                "calendar": "Календарь",
+                "camera_roll": "Галерею",
+                "contacts": "Контакты",
+                "notes": "Заметки",
+                "sms": "СМС и iMessage",
+                "voice_memos": "Диктофон",
+                "voicemail": "Голосовую почту"
+            },
+            "device_info": {
+                "device_image": "ВЫБЕРИТЕ РК",
+                "device_name_label": "**Название устройства**",
+                "model": "Модель:",
+                "ios_version": "Версия iOS:",
+                "serial_number": "Серийный номер:",
+                "imei": "IMEI:"
+            },
+            "backup_info": {
+                "backup_info": "**Данные о РК**",
+                "date": "Дата:",
+                "itunes_version": "Версия iTunes:",
+                "encrypted": "Зашифровано:",
+                "passcode_set": "Установлен пароль:"
+            },
+            "status_tips": {
+                "add_backup_button": "Импортировать резервные копии из сторонней директории",
+                "backup_table": "Список импортированных резервных копий",
+                "device_name_label": "Пользовательское имя устройства",
+                "device_image": "Изображение устройства",
+                "model_label": "Модель устройства",
+                "ios_version_label": "Версия iOS",
+                "serial_number_label": "Серийный номер",
+                "imei_label": "IMEI",
+                "call_history_checkbox": "Извлечь историю звонков?",
+                "calendar_checkbox": "Извлечь события из календаря?",
+                "camera_roll_checkbox": "Извлечь фото и видео?",
+                "contacts_checkbox": "Извлечь контакты?",
+                "notes_checkbox": "Извлечь заметки?",
+                "sms_checkbox": "Извлечь переписки СМС и iMessage?",
+                "voice_memos_checkbox": "Извлечь записи диктофона?",
+                "voicemail_checkbox": "Извлечь голосовую почту?",
+                "start_button": "Запустить извлечение",
+                "backup_date_label": "Дата последнего резервного копирования",
+                "backup_itunes_ver_label": "Версия iTunes, использованная для создания РК",
+                "backup_is_encrypted_label": "Зашифрована ли РК?",
+                "backup_passcode_set_label": "Установлен ли пароль?",
+                "action_add_backup": "Импортировать РК из нестандартного пути",
+                "action_export": "Запустить извлечение",
+                "action_delete_backup": "Удалить выбранную РК",
+                "action_exit": "Выйти из DeTuner",
+                "action_settings": "Открыть меню настроек"
+            }
+        },
+        "quit_dialog": {
+            "title": "Выйти?",
+            "label": "Выйти из DeTuner?",
+            "quit_button": "Выйти",
+            "cancel_button": "Отмена"
+        },
+        "handler": {
+            "backup_dir_prefix": "Резервная_копия_",
+            "camera_roll": {
+                "directory": "Галерея"
+            },
+            "voice_memos": {
+                "directory": "Диктофон"
+            },
+            "contacts": {
+                "directory": "Контакты",
+                "file_name": "Список контактов",
+                "templates": {
+                    "id": "ID: {id}\n",
+                    "display_name": "Отображаемое имя: {name}\n",
+                    "first_name": "Имя: {name}\n",
+                    "second_name": "Второе имя: {name}\n",
+                    "middle_name": "Отчество: {name}\n",
+                    "last_name": "Фамилия: {name}\n",
+                    "nickname": "Псевдоним: {nickname}\n",
+                    "organization": "Огранизация: {org}\n",
+                    "job_title": "Должность: {title}\n",
+                    "note": "Заметки: {note}\n",
+                    "birthday": "День рождения: {date}\n",
+                    "phone": "Номер телефона: {phone}\n",
+                    "email": "E-mail: {email}\n",
+                    "social_profile": "Социальный профиль: {profile}\n",
+                    "url": "URL: {url}\n",
+                    "created": "Создан: {date}\n"
+                }
+            },
+            "call_history": {
+                "directory": "История звонков",
+                "file_name": "История звонков",
+                "header": [
+                    "ID",
+                    "Номер телефона",
+                    "Дата и время",
+                    "Продолжительность"
+                ]
+            },
+            "calendar": {
+                "directory": "Календарь",
+                "file_name": "События",
+                "templates": {
+                    "summary": "Название: {summ}\n",
+                    "start": "Начало: {start}\n",
+                    "end": "Окончание: {end}\n",
+                    "all_day": "Весь день\n",
+                    "description": "Описание:\n{desc}\n\n"
+                }
+            },
+            "notes": {
+                "directory": "Заметки",
+                "no_title_file_name": "Без_названия",
+                "templates": {
+                    "title": "Название: {title}\n",
+                    "no_title": "Название: Без названия\n",
+                    "created": "Создана: {date}\n",
+                    "last_modified": "Последнее изменение: {date}\n",
+                    "summary": "Описание: {summ}\n",
+                    "no_summary": "Описание: Отсутствует\n",
+                    "is_deleted": "Удалена: {val}\n",
+                    "content": "Текст:\n{cont}\n"
+                }
+            },
+            "sms_imessage": {
+                "directory": "СМС & iMessage",
+                "attachments_directory": "Прикреплённые файлы",
+                "chat_file_name": "история_сообщений",
+                "templates": {
+                    "id": "ID: {id}\n",
+                    "from": "От: {handle}\n",
+                    "from_me": "От: меня\n",
+                    "date": "Дата: {date}\n",
+                    "delivered": "Доставлено: {date}\n",
+                    "read": "Прочитано: {date}\n",
+                    "content": "-----------\n{text}\n\n"
+                }
+            },
+            "voicemail": {
+                "directory": "Голосовая почта",
+                "file_name": "Метаданные голосовой почты",
+                "templates": {
+                    "sender": "Отправитель: {sender}\n",
+                    "date": "Дата: {date}\n",
+                    "duration": "Продолжительность: {dur}\n\n"
+                }
+            }
+        },
+        "messages": {
+            "codes": {
+                "warning": "Предупреждение",
+                "error": "Ошибка!",
+                "info": "Информация"
+            },
+            "no_backups_found": "Резервные копии не найдены!",
+            "unable_to_delete_no_selected": "Резервная копия не выбрана!",
+            "unable_to_delete_default": "Невозможно удалить РК из стандартной директории",
+            "no_backup_selected": "Резервная копия не выбрана!",
+            "empty_passcode": "Введён пустой пароль!",
+            "unable_to_decrypt": "Ошибка расшифровывания РК: неверный пароль?",
+            "thread_start_error": "Критическая ошибка запуска потока",
+            "unable_to_import": "Ошибка импортирования РК {backup_id}: недействительная РК",
+            "unknown_import_error": "В ходе импортирования РК возникла неизвестная ошибка",
+            "unable_to_import_external": "Ошибка при импортировании сторонней РК",
+            "extraction_start_error": "Критическая ошибка запуска извлечения",
+            "extraction_canceled": "Извлечение отменено",
+            "backup_already_added": "Эта резервная копия уже добавлена",
+            "extraction_completed": "Извлечение завершено"
+        },
+        "get_dir_path": {
+            "select_backup_dir": "Выберите папку резервной копии",
+            "select_output_dir": "Выберите путь для извлечения"
+        },
+        "passcode_dialog": {
+            "title": "Введите пароль",
+            "body": "Данная резервная копия требует пароля для извлечения"
+        }
+    }
+}
