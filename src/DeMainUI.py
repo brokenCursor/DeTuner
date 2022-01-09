@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+from PyQt5 import QtCore, QtGui, QtWidgets
+from DeSettingUIController import DeSetingsUIController
 from DeWorker import DeWorker
 from ui.DeMainUILayout import DeMainUILayout
 from ui.DeQuitDialogLayout import DeQuitDialogLayout
-from ui.DeSettingsLayout import DeSettingsLayout
 from DeBackup import DeBackup, InvalidBackupException
 from DeBackupHandler import DeBackupHandler
 from DeSettingsManager import DeSettingsManager
 from DeLocaleManager import DeLocaleManager
-from PyQt5.QtWidgets import QApplication, QLineEdit, QMainWindow, QFileDialog, QMessageBox, QListWidgetItem, QInputDialog, QProgressBar, QMainWindow
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import QThreadPool, Qt
 from easter_egg import *
 
 
-class DeMainUI(QMainWindow, DeMainUILayout):
+class DeMainUI(QtWidgets.QMainWindow, DeMainUILayout):
     ''' The (temporarely) main class of DeTuner app '''
 
     def __init__(self):
@@ -27,13 +25,16 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         # Load locale strings
         system_locale = self.__locale_manager.get_system_locale()
-        if system_locale in [loc[0] for loc in
-                             self.__locale_manager.get_avaliable_locales()]:
-            self.__locale_manager.set_locale(system_locale)
-        else:
-            stored_locale = self.__settings_manager.get_locale()
-            self.__locale_manager.set_locale(stored_locale)
+        stored_locale = self.__settings_manager.get_locale()
 
+        if stored_locale:
+            self.__locale_manager.set_locale(stored_locale)
+        else:
+            if system_locale in [loc[0] for loc in
+                             self.__locale_manager.get_avaliable_locales()]:
+                self.__settings_manager.update_locale(system_locale)
+                self.__locale_manager.set_locale(system_locale)
+        
         self.locale_strings = self.__locale_manager.get_strings()
 
         # Setup UI
@@ -42,7 +43,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.setupUi(self)
 
         # Insert progress_bar into status_bar
-        self.progress_bar = QProgressBar()
+        self.progress_bar = QtWidgets.QProgressBar()
         self.status_bar.addPermanentWidget(self.progress_bar)
         self.progress_bar.hide()
 
@@ -55,14 +56,14 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             self.update_selected_backup_info)
 
         # Setup backup_tables context menu
-        self.backup_table.setContextMenuPolicy(Qt.ActionsContextMenu)
+        self.backup_table.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
         self.backup_table.addActions(
             [self.action_add_backup, self.action_delete_backup])
 
         # Define important variables
         self.__backups = []
         self.__progress = {}
-        self.__threadpool = QThreadPool().globalInstance()
+        self.__threadpool = QtCore.QThreadPool().globalInstance()
 
         # Import all known backups
         self.import_default_backups()
@@ -70,7 +71,6 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         if not self.__backups:
             self.show_warning(
                 self.locale_strings["messages"]["no_backups_found"])
-
 
     def bind_buttons(self):
         """ Attach button's "clicked" signal to it's function """
@@ -83,7 +83,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
         self.action_add_backup.triggered.connect(self.add_external_backup)
         self.action_export.triggered.connect(self.start_extraction)
-        self.action_exit.triggered.connect(self.quit)
+        self.action_exit.triggered.connect(self.close)
         self.action_delete_backup.triggered.connect(
             self.delete_selected_backup)
         self.action_settings.triggered.connect(self.open_settings_window)
@@ -129,8 +129,8 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         self.serial_number_label.setText("S/N: " + backup.serial_number())
         self.imei_label.setText(dev_strings["imei"] + " " + backup.imei())
         icon_filename = backup.product_type()
-        pixmap = QPixmap(f"./assets/device_icons/{icon_filename}", ).scaled(
-            80, 130, aspectRatioMode=1)
+        pixmap = QtGui.QPixmap(f"./assets/device_icons/{icon_filename}", ).scaled(
+            80, 130, aspectRatioMode=1, transformMode=QtCore.Qt.SmoothTransformation)
         self.device_image.setPixmap(pixmap)
 
         # Fill in backup info
@@ -261,9 +261,9 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         for b in self.__backups:
             item_text = b.display_name() + '\n' + b.last_backup_date()
             icon_filename = b.product_type()
-            item_icon = QIcon(f"./assets/device_icons/{icon_filename}")
+            item_icon = QtGui.QIcon(f"./assets/device_icons/{icon_filename}")
             self.backup_table.addItem(
-                QListWidgetItem(item_icon, item_text))
+                QtWidgets.QListWidgetItem(item_icon, item_text))
 
     def add_external_backup(self):
         ''' Add backup from user-provided location '''
@@ -286,12 +286,12 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def get_dir_path(self, title, start: str = '.') -> str | None:
         ''' Return path to a user-selected directory '''
 
-        path = QFileDialog.getExistingDirectory(
+        path = QtWidgets.QFileDialog.getExistingDirectory(
             self, title, start)
         return path if path else None
 
     def show_message(self, message: str = "An unknown error ocurred!",
-                     icon: QMessageBox.Icon = QMessageBox.Critical,
+                     icon: QtWidgets.QMessageBox.Icon = QtWidgets.QMessageBox.Critical,
                      title: str = 'Unknown Error', **kwargs) -> str | None:
         ''' Show a QMessageBox with provided parameters
 
@@ -318,9 +318,9 @@ class DeMainUI(QMainWindow, DeMainUILayout):
             global func_result
             func_result = i.text()
         # Setup QMessageBox
-        msg = QMessageBox()
+        msg = QtWidgets.QMessageBox()
         msg.setIcon(icon)
-        msg.setWindowIcon(QIcon('./assets/icon24'))
+        msg.setWindowIcon(QtGui.QIcon('./assets/icon24'))
         msg.setText(message)
         if 'details' in kwargs:
             msg.setDetailedText(kwargs['details'])
@@ -328,7 +328,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         if 'button' in kwargs:
             msg.setStandardButtons(kwargs['buttons'])
         else:
-            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.buttonClicked.connect(result_hook)
 
         # Show QMessageBox
@@ -339,21 +339,21 @@ class DeMainUI(QMainWindow, DeMainUILayout):
     def show_warning(self, message, **kwargs) -> None | str:
         ''' A warning wrapper for show_message function'''
 
-        return self.show_message(message, QMessageBox.Warning,
+        return self.show_message(message, QtWidgets.QMessageBox.Warning,
                                  self.locale_strings["messages"]["codes"]["warning"],
                                  **kwargs)
 
     def show_error(self, message, **kwargs) -> None | str:
         ''' An error wrapper for show_message function'''
 
-        return self.show_message(message, QMessageBox.Critical,
+        return self.show_message(message, QtWidgets.QMessageBox.Critical,
                                  self.locale_strings["messages"]["codes"]["error"],
                                  **kwargs)
 
     def show_info(self, message, **kwargs) -> None | str:
         ''' An info wrapper for show_message function'''
 
-        return self.show_message(message, QMessageBox.Information,
+        return self.show_message(message, QtWidgets.QMessageBox.Information,
                                  self.locale_strings["messages"]["codes"]["info"],
                                  **kwargs)
 
@@ -374,11 +374,11 @@ class DeMainUI(QMainWindow, DeMainUILayout):
         """ Show a QInputDialog for user to enter encryption passcode """
         strings = self.locale_strings["passcode_dialog"]
 
-        dialog = QInputDialog()
-        dialog.setTextEchoMode(QLineEdit.EchoMode.Password)
+        dialog = QtWidgets.QInputDialog()
+        dialog.setTextEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         passcode, result = dialog.getText(
             self, strings["title"], strings["body"],
-            QLineEdit.EchoMode.Password)
+            QtWidgets.QLineEdit.EchoMode.Password)
         return passcode, result
 
     def easter_egg(self, passcode):
@@ -463,7 +463,7 @@ class DeMainUI(QMainWindow, DeMainUILayout):
 
             # Yes, that's not how it supposed to be done, but it works
             while self.__threadpool.activeThreadCount():
-                QApplication.processEvents()
+                QtWidgets.QApplication.processEvents()
 
             if not decryption_result:
                 self.show_error(
@@ -526,24 +526,21 @@ class DeMainUI(QMainWindow, DeMainUILayout):
                 self.locale_strings["messages"]["extraction_start_error"], details=e)
 
     def open_settings_window(self):
-        self.settings_window = DeSettingsLayout(None, [])
-        self.settings_window.setupUi(self.settings_window)
-        self.settings_window.show()   
-        s    
-
-    def quit(self):
-        """ Show "Quit?" dialog """
+        self.settings_window = DeSetingsUIController(
+            self.locale_strings["settings_window"], self.__settings_manager, self.__locale_manager)
+    
+    def closeEvent(self, event: QtGui.QCloseEvent) -> None:
         self.quit_dialog = DeQuitDialogLayout(self,
                                               self.locale_strings["quit_dialog"])
         self.quit_dialog.setupUi(self.quit_dialog)
         if self.quit_dialog.exec():
-            sys.exit(0)
+            event.accept()
         else:
-            pass
-
+            event.ignore()
+        
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     ex = DeMainUI()
     ex.show()
     sys.exit(app.exec_())

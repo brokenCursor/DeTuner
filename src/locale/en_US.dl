@@ -12,7 +12,8 @@
                 "add_backup": "Add backup",
                 "delete_backup": "Delete backup",
                 "extract": "Extract",
-                "exit": "Exit"
+                "exit": "Exit",
+                "settings": "Settings"
             },
             "buttons": {
                 "add_backup": "Add backup",
@@ -69,11 +70,31 @@
                 "action_add_backup": "Import backup from non-iTunes directory",
                 "action_export": "Start extraction",
                 "action_delete_backup": "Delete selected backup",
-                "action_exit": "Quit DeTuner"
+                "action_exit": "Quit DeTuner",
+                "action_settings": "Open settings menu"
+            }
+        },
+        "settings_window":{
+            "title": "Settings",
+            "language_label": "Language",
+            "general_settings": "General",
+            "image_not_found": "Image not found",
+            "version": "Version",
+            "author": "by broken_cursor",
+            "about": "About",
+            "save_button": "Save",
+            "cancel_button": "Cancel",
+            "restart_required": "Restart required for changes to take effect",
+            "restart_required_title": "Информация",
+            "quit_dialogs": {
+                "title": "Save changes?",
+                "label": "Save changes?",
+                "save_button": "Save",
+                "cancel_button": "Don't save"
             }
         },
         "quit_dialog": {
-            "window_title": "Quit?",
+            "title": "Quit?",
             "label": "Quit DeTuner?",
             "quit_button": "Quit",
             "cancel_button": "Cancel"

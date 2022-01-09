@@ -74,6 +74,25 @@
                 "action_settings": "Открыть меню настроек"
             }
         },
+        "settings_window":{
+            "title": "Настройки",
+            "language_label": "Язык",
+            "general_settings": "Общие",
+            "image_not_found": "Изображение не найдено",
+            "version": "Версия",
+            "author": "Разработал broken_cursor",
+            "about": "О программе",
+            "save_button": "Сохранить",
+            "cancel_button": "Отмена",
+            "restart_required": "Для применения настроек требуется перезапустить приложение",
+            "restart_required_title": "Информация",
+            "quit_dialog": {
+                "title": "Сохранить изменения?",
+                "label": "Сохранить изменения?",
+                "save_button": "Сохранить",
+                "cancel_button": "Не сохранять"
+            }
+        },
         "quit_dialog": {
             "title": "Выйти?",
             "label": "Выйти из DeTuner?",

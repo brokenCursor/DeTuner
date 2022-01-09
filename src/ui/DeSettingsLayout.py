@@ -1,15 +1,20 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class DeSettingsLayout(QtWidgets.QWidget):
-    def __init__(self, parent, locale) -> None:
-        super().__init__(parent)
-        self.strings = locale
-    
+class DeSettingsLayout(object):
+    def set_locale(self, locale):
+        self.locale = locale
+
     def setupUi(self, settings_window):
         settings_window.setObjectName("settings_window")
         settings_window.resize(490, 331)
         settings_window.setFocusPolicy(QtCore.Qt.StrongFocus)
+
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("./assets/icon24.png"),
+                       QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        settings_window.setWindowIcon(icon)
+
         self.gridLayoutWidget = QtWidgets.QWidget(settings_window)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(0, 0, 491, 301))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
@@ -23,10 +28,10 @@ class DeSettingsLayout(QtWidgets.QWidget):
         self.label = QtWidgets.QLabel(self.general)
         self.label.setGeometry(QtCore.QRect(10, 10, 61, 16))
         self.label.setObjectName("label")
-        self.comboBox = QtWidgets.QComboBox(self.general)
-        self.comboBox.setGeometry(QtCore.QRect(10, 30, 141, 22))
-        self.comboBox.setEditable(False)
-        self.comboBox.setObjectName("comboBox")
+        self.lang_select_box = QtWidgets.QComboBox(self.general)
+        self.lang_select_box.setGeometry(QtCore.QRect(10, 30, 141, 22))
+        self.lang_select_box.setEditable(False)
+        self.lang_select_box.setObjectName("comboBox")
         self.tabWidget.addTab(self.general, "")
         self.about = QtWidgets.QWidget()
         self.about.setObjectName("about")
@@ -40,10 +45,10 @@ class DeSettingsLayout(QtWidgets.QWidget):
         self.label_3.setTextFormat(QtCore.Qt.MarkdownText)
         self.label_3.setAlignment(QtCore.Qt.AlignCenter)
         self.label_3.setObjectName("label_3")
-        self.label_2 = QtWidgets.QLabel(self.about)
-        self.label_2.setGeometry(QtCore.QRect(160, 10, 150, 150))
-        self.label_2.setTextFormat(QtCore.Qt.MarkdownText)
-        self.label_2.setObjectName("label_2")
+        self.logo_label = QtWidgets.QLabel(self.about)
+        self.logo_label.setGeometry(QtCore.QRect(160, 10, 150, 150))
+        self.logo_label.setTextFormat(QtCore.Qt.MarkdownText)
+        self.logo_label.setObjectName("label_2")
         self.label_4 = QtWidgets.QLabel(self.about)
         self.label_4.setGeometry(QtCore.QRect(190, 200, 91, 20))
         self.label_4.setObjectName("label_4")
@@ -57,26 +62,27 @@ class DeSettingsLayout(QtWidgets.QWidget):
         self.save_button.setGeometry(QtCore.QRect(410, 305, 75, 23))
         self.save_button.setDefault(True)
         self.save_button.setObjectName("save_button")
-        self.buttonGroup = QtWidgets.QButtonGroup(settings_window)
-        self.buttonGroup.setObjectName("buttonGroup")
-        self.buttonGroup.addButton(self.save_button)
+
         self.cancel_button = QtWidgets.QPushButton(settings_window)
         self.cancel_button.setGeometry(QtCore.QRect(320, 305, 75, 23))
         self.cancel_button.setObjectName("cancel_button")
-        self.buttonGroup.addButton(self.cancel_button)
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+
+        #self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.retranslateUi(settings_window)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
     def retranslateUi(self, settings_window):
         _translate = QtCore.QCoreApplication.translate
-        settings_window.setWindowTitle(_translate("settings_window", "Settings"))
-        self.label.setText(_translate("settings_window", "Language"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.general), _translate("settings_window", "General"))
+        settings_window.setWindowTitle(
+            _translate("settings_window", self.locale["title"]))
+        self.label.setText(_translate("settings_window", self.locale["language_label"]))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(
+            self.general), _translate("settings_window", self.locale["general_settings"]))
         self.label_3.setText(_translate("settings_window", "**DeTuner**"))
-        self.label_2.setText(_translate("settings_window", "TextLabel"))
-        self.label_4.setText(_translate("settings_window", "Version"))
-        self.label_5.setText(_translate("settings_window", "by broken_cursor"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.about), _translate("settings_window", "About"))
-        self.save_button.setText(_translate("settings_window", "Save"))
-        self.cancel_button.setText(_translate("settings_window", "Cancel"))
+        self.logo_label.setText(_translate("settings_window", self.locale["image_not_found"]))
+        self.label_4.setText(_translate("settings_window", self.locale["version"]))
+        self.label_5.setText(_translate("settings_window", self.locale["author"]))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(
+            self.about), _translate("settings_window", self.locale["about"]))
+        self.save_button.setText(_translate("settings_window", self.locale["save_button"]))
+        self.cancel_button.setText(_translate("settings_window", self.locale["cancel_button"]))
