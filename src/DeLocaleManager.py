@@ -10,6 +10,7 @@ class DeLocaleManager:
         self.__avaliable_locales = []
         self.__system_locale, self.__encoding = locale.getdefaultlocale()
         self.__locale_data = None
+        self.__current_locale = None
         self.load_locales()
 
     def load_locales(self):
@@ -56,16 +57,21 @@ class DeLocaleManager:
 
         # Search for matching names
         locale_match = [
-            loc for loc in self.__avaliable_locales if loc[1] == locale_name]
+            loc for loc in self.__avaliable_locales if loc[1] == locale_name][0]
 
         if not locale_match:
             raise ValueError(f"No \"{locale_name}\" locale found")
 
+        self.__current_locale = locale_match
+
         try:
-            with open(f"locale/{locale_match[0][0]}", "r", encoding="utf-8-sig") as f:
+            with open(f"locale/{locale_match[0]}", "r", encoding="utf-8-sig") as f:
                 self.__locale_data = json.loads(f.read())
         except Exception as e:
             raise Exception(F"Unable to set locale {locale_name}: {e}")
+
+    def get_current_locale(self):
+        return (self.__current_locale[1], self.__current_locale[2])
 
     def get_strings(self):
         return self.__locale_data["strings"]
