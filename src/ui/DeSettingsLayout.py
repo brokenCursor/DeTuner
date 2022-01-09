@@ -10,6 +10,17 @@ class DeSettingsLayout(object):
         settings_window.resize(490, 331)
         settings_window.setFocusPolicy(QtCore.Qt.StrongFocus)
 
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(
+            settings_window.sizePolicy().hasHeightForWidth())
+
+        settings_window.setSizePolicy(sizePolicy)
+        settings_window.setMinimumSize(QtCore.QSize(490, 331))
+        settings_window.setMaximumSize(QtCore.QSize(331, 490))
+        
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("./assets/icon24.png"),
                        QtGui.QIcon.Normal, QtGui.QIcon.Off)

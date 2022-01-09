@@ -291,7 +291,8 @@ class DeBackupHandler:
                 if url:
                     contact_string += strings["templates"]["url"].format(
                         url=url)
-                contact_string += strings["templates"]["created"].format(date=created)
+                contact_string += strings["templates"]["created"].format(
+                    date=created)
                 contact_string += "--------------------------\n\n"
 
                 f.write(contact_string)

@@ -50,7 +50,6 @@ DeTuner is a tool designed for easy extraction of data from local iTunes backups
 6. Wait for the end of the extraction process
    
 # TODO
-- Add settings and about menus
 - Add Camera Roll album reconstruction
 - Add phone number detecting formatting in Contacts
 - Add combined SMS & iMessage chat support (they are separate as of right now)
