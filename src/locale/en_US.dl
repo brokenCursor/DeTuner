@@ -36,7 +36,7 @@
                 "model": "Model:",
                 "ios_version": "iOS Version:",
                 "serial_number": "Serial Number",
-                "imei": "IMEI"
+                "imei": "IMEI:"
             },
             "backup_info": {
                 "backup_info": "**Backup Info**",
@@ -85,8 +85,8 @@
             "save_button": "Save",
             "cancel_button": "Cancel",
             "restart_required": "Restart required for changes to take effect",
-            "restart_required_title": "Информация",
-            "quit_dialogs": {
+            "restart_required_title": "Info",
+            "quit_dialog": {
                 "title": "Save changes?",
                 "label": "Save changes?",
                 "save_button": "Save",

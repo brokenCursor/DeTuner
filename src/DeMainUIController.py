@@ -13,7 +13,7 @@ from DeLocaleManager import DeLocaleManager
 from easter_egg import *
 
 
-class DeMainUI(QtWidgets.QMainWindow, DeMainUILayout):
+class DeMainUIController(QtWidgets.QMainWindow, DeMainUILayout):
     ''' The (temporarely) main class of DeTuner app '''
 
     def __init__(self):
@@ -541,6 +541,6 @@ class DeMainUI(QtWidgets.QMainWindow, DeMainUILayout):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    ex = DeMainUI()
+    ex = DeMainUIController()
     ex.show()
     sys.exit(app.exec_())
